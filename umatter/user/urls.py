@@ -1,6 +1,8 @@
 from django.urls import path
 
-from .views import RegisterAPIView
+from .views import kakao_login, kakao_callback, KakaoLogin, RegisterAPIView 
+
+
 
 
 urlpatterns = [
@@ -9,19 +11,19 @@ urlpatterns = [
         view=RegisterAPIView.as_view(),
         name='register'
     ),
-    # path(
-    #     route='kakao/login',
-    #     view=kakao_login,
-    #     name='google_login'
-    # ),
-    # path(
-    #     route='kakao/callback/',
-    #     view=kakao_callback,
-    #     name='google_callback'
-    # ),
-    # path(
-    #     route='kakao/login/finish/',
-    #     view=KakaoLogin.as_view(),
-    #     name='google_login_todjango'
-    # ),
+    path(
+        route='kakao/login',
+        view=kakao_login,
+        name='kakao_login',
+    ),
+    path(
+        route='kakao/login/callback/',
+        view=kakao_callback,
+        name='kakao_callback',
+    ),
+    path(
+        route='kakao/login/finish/',
+        view=KakaoLogin.as_view(),
+        name='kakao_login_todjango',
+    ),
 ]

@@ -1,18 +1,88 @@
-
 import jwt
+import logging
+import os
+import requests
+from urllib.parse import urlencode
 
 from django.contrib.auth import authenticate
-from django.shortcuts import render, get_object_or_404
+from django.http import JsonResponse
+from django.shortcuts import get_object_or_404, redirect
 
 from .models import User
 from .serializers import UserSerializer
+from .services import create_redirect_uri_for_kakao, get_user_by_kakao_token
 
-from umatter.settings import SECRET_KEY
+from umatter.settings import SECRET_KEY, BASE_URL
 
+from dj_rest_auth.registration.views import SocialLoginView
+from allauth.socialaccount.providers.kakao import views as kakao_view
+from allauth.socialaccount.providers.oauth2.client import OAuth2Client
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer, TokenRefreshSerializer
 from rest_framework.views import APIView
+
+
+logger = logging.getLogger(__name__)
+
+# KAKAO_CALLBACK_URI = BASE_URL + '/api/user/kakao/login/callback/'
+def kakao_login(request):
+
+    scope = os.environ.get("AUTH_KAKAO_SCOPE")
+
+    base_url = "https://kauth.kakao.com/oauth/authorize"
+    params = {
+        "response_type": "code",
+        "scope": scope,
+    }
+    url = create_redirect_uri_for_kakao(base_url, params)
+    return redirect(url)
+
+
+def kakao_callback(request):
+    code = request.GET.get("code")
+
+    # code로 access token 요청
+    base_url = "https://kauth.kakao.com/oauth/token"
+    params = {
+        "grant_type": "authorization_code",
+        "code": code,
+    }
+    url = create_redirect_uri_for_kakao(base_url, params)
+
+    token_request = requests.get(url)
+    token_response_json = token_request.json()
+
+    # 에러 발생 시 중단
+    err = token_response_json.get("error", None)
+    logger.info(err)
+    if err is not None:
+        raise ValueError(err)
+
+    access_token = token_response_json.get("access_token")
+    logger.info(f"kakao access token: {access_token}")
+
+    # access token으로 카카오톡 프로필 요청
+    profile_request = requests.post(
+        "https://kapi.kakao.com/v2/user/me",
+        headers={"Authorization": f"Bearer {access_token}"},
+    )
+    profile_json = profile_request.json()
+    logger.info(f"profile: {profile_json}")
+
+    kakao_account = profile_json.get("kakao_account")
+    email = kakao_account.get("email", None) # 이메일!
+
+    # 이메일 없으면 오류 => 카카오톡 최신 버전에서는 이메일 없이 가입 가능해서 추후 수정해야함
+    if email is None:
+        return JsonResponse({'err_msg': 'failed to get email'}, status=status.HTTP_400_BAD_REQUEST)
+
+    
+class KakaoLogin(SocialLoginView):
+    adapter_class = kakao_view.KakaoOAuth2Adapter
+    # callback_url = KAKAO_CALLBACK_URI
+    callback_url = BASE_URL + os.environ.get("AUTH_KAKAO_REDIRECT_URI_PATH")
+    client_class = OAuth2Client
 
 
 class RegisterAPIView(APIView):

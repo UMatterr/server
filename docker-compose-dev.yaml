@@ -1,12 +1,12 @@
 services:
   db:
     image: postgres:15
-    volumes:
-      - ./db:/var/lib/postgresql/data
+    # volumes:
+    #   - ./db:/var/lib/postgresql/data
     env_file:
       - ./config/postgres/.env-dev
     ports:
-      - "5432:5432"
+      - 5432:5432
   web:
     build: .
     command: python manage.py runserver 0.0.0.0:8000
