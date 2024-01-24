@@ -13,17 +13,14 @@ import os
 from datetime import timedelta
 from pathlib import Path
 
-from django.utils.log import DEFAULT_LOGGING
-from core.utils import load_env
+from core.utils import load_env, get_env
 
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
-CONFIG_DIR = BASE_DIR / '../config/django'
+# CONFIG_DIR = BASE_DIR / '../config/django'
 
-get_env = os.environ.get
-# load_env(BASE_DIR / ".env") #here you indicate where your .env file is
-load_env(CONFIG_DIR / ".env-dev")
+# load_env(BASE_DIR / ".env-local") #here you indicate where your .env file is
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
@@ -36,7 +33,6 @@ DEBUG = get_env("DJANGO_DEBUG", "False") == "True"
 
 ALLOWED_HOSTS = get_env("DJANGO_ALLOWED_HOSTS", "").split()
 BASE_URL = get_env("DJANGO_BASE_URL", "")
-
 
 # Application definition
 INSTALLED_APPS = [

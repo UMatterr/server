@@ -1,17 +1,20 @@
 import jwt
 import logging
-import os
 import requests
+import traceback as tb
 from urllib.parse import urlencode
 
+from core.utils import get_env
 from django.contrib.auth import authenticate
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect
 
 from .models import User
 from .serializers import UserSerializer
-from .services import create_redirect_uri_for_kakao, get_user_by_kakao_token
-
+from .services import (
+    create_redirect_uri_for_kakao, get_user_by_kakao_id,
+    create_user_with_kakao_info,
+)
 from umatter.settings import SECRET_KEY, BASE_URL
 
 from dj_rest_auth.registration.views import SocialLoginView
@@ -23,12 +26,12 @@ from rest_framework_simplejwt.serializers import TokenObtainPairSerializer, Toke
 from rest_framework.views import APIView
 
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger("user.views")
 
 # KAKAO_CALLBACK_URI = BASE_URL + '/api/user/kakao/login/callback/'
 def kakao_login(request):
 
-    scope = os.environ.get("AUTH_KAKAO_SCOPE")
+    scope = get_env("AUTH_KAKAO_SCOPE")
 
     base_url = "https://kauth.kakao.com/oauth/authorize"
     params = {
@@ -55,33 +58,78 @@ def kakao_callback(request):
 
     # 에러 발생 시 중단
     err = token_response_json.get("error", None)
-    logger.info(err)
     if err is not None:
-        raise ValueError(err)
+        logger.error(tb.format_exc())
+        return JsonResponse(
+            {'msg': 'failed to get user infor from kakao'},
+            status=status.HTTP_400_BAD_REQUEST
+        )
 
     access_token = token_response_json.get("access_token")
-    logger.info(f"kakao access token: {access_token}")
+    # logger.info(f"kakao access token: {access_token}")
 
     # access token으로 카카오톡 프로필 요청
-    profile_request = requests.post(
+    res = requests.post(
         "https://kapi.kakao.com/v2/user/me",
         headers={"Authorization": f"Bearer {access_token}"},
     )
-    profile_json = profile_request.json()
-    logger.info(f"profile: {profile_json}")
+    kakao_res = res.json()
+    logger.info(f"profile: {kakao_res}")
 
-    kakao_account = profile_json.get("kakao_account")
+    kakao_id = kakao_res.get("id", None)
+    kakao_account = kakao_res.get("kakao_account", None)
     email = kakao_account.get("email", None) # 이메일!
+    kakao_profile = kakao_account.get("profile", None) # kakao profile!
+    if kakao_profile is None:
+        logger.error(f"return value from kakao: {kakao_res}")
+        return JsonResponse(
+            {'msg': 'failed to find kakao account profile'},
+            status=status.HTTP_400_BAD_REQUEST
+        )
+
+    kakao_nickname = kakao_profile.get("nickname", None) # 닉네임!
+    profile_thumbnail = kakao_profile.get("thumbnail_image_url", None) # kakao thumbnail image!
+
+    if kakao_id is None:
+        return JsonResponse(
+            {'msg': 'failed to find kakao id'},
+            status=status.HTTP_400_BAD_REQUEST
+        )
 
     # 이메일 없으면 오류 => 카카오톡 최신 버전에서는 이메일 없이 가입 가능해서 추후 수정해야함
     if email is None:
-        return JsonResponse({'err_msg': 'failed to get email'}, status=status.HTTP_400_BAD_REQUEST)
+        return JsonResponse(
+            {'msg': 'failed to get email'},
+            status=status.HTTP_400_BAD_REQUEST
+        )
+
+    user = get_user_by_kakao_id(kakao_id)
+    if user is None:
+        return JsonResponse(
+            {'msg': 'failed to get user info'},
+            status=status.HTTP_400_BAD_REQUEST
+        )
+    if user == 1:
+        user = create_user_with_kakao_info(
+            kakao_id=kakao_id,
+            email=email,
+            kakao_nickname=kakao_nickname,
+            profile_thumbnail=profile_thumbnail,
+        )
+        logger.info(f"Created user: {type(user)} {user}")
+
+    user = UserSerializer(user).data
+
+    return JsonResponse(
+        user,
+        status=status.HTTP_200_OK
+    )
 
     
 class KakaoLogin(SocialLoginView):
     adapter_class = kakao_view.KakaoOAuth2Adapter
     # callback_url = KAKAO_CALLBACK_URI
-    callback_url = BASE_URL + os.environ.get("AUTH_KAKAO_REDIRECT_URI_PATH")
+    callback_url = BASE_URL + get_env("AUTH_KAKAO_REDIRECT_URI_PATH")
     client_class = OAuth2Client
 
 

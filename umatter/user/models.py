@@ -1,3 +1,5 @@
+import uuid
+
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser,  BaseUserManager, PermissionsMixin
 
@@ -37,27 +39,53 @@ class User(AbstractBaseUser, PermissionsMixin, TimestampModel):
 
     objects = UserManager()
 
+    id = models.UUIDField(
+        primary_key=True,
+        default=uuid.uuid4,
+        editable=False,
+    )
+    kakao_id = models.CharField(
+        max_length=255,
+        unique=True,
+        editable=False,
+    )
+    kakao_nickname = models.CharField(
+        max_length=255,
+        null=True,
+    )
+    profile_thumbnail = models.SlugField(
+        max_length=500,
+        null=True,
+    )
     email = models.EmailField(
         max_length=255,
         unique=True,
     )
+    # if it's not an empty string, it will show
     username = models.CharField(
-        max_length=20,
-        null=False,
-        unique=True
+        max_length=255,
+        default="",
     )
-    is_active = models.BooleanField(default=True)
-    is_staff = models.BooleanField(default=False)
-    is_admin = models.BooleanField(default=False)
-    is_superuser = models.BooleanField(default=False)
+    is_active = models.BooleanField(
+        default=True,
+    )
+    is_staff = models.BooleanField(
+        default=False,
+    )
+    is_admin = models.BooleanField(
+        default=False,
+    )
+    is_superuser = models.BooleanField(
+        default=False,
+    )
     # verified_email = models.BooleanField(default=False)
     # verified_phone_number = models.BooleanField(default=False)
 
-    USERNAME_FIELD = 'username'
+    USERNAME_FIELD = 'email'
 
-    REQUIRED_FIELDS = [
-        'email', 'password',
-    ]
+    # REQUIRED_FIELDS = [
+    #     'email', 'password',
+    # ]
 
     class Meta:
         db_table = 'user'
