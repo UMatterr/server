@@ -6,16 +6,10 @@ from .views import (
     kakao_logout,
     refresh_kakao_access_token,
     KakaoLogin,
-    # RegisterAPIView 
 )
 
 
 urlpatterns = [
-    # path(
-    #     route='register',
-    #     view=RegisterAPIView.as_view(),
-    #     name='register'
-    # ),
     path(
         route='login',
         view=kakao_login,
