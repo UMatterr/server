@@ -33,7 +33,6 @@ logger = logging.getLogger("user.views")
 
 def kakao_login(request):
 
-    # TODO: how to clear cookies remains when the server is down
     scope = get_env("AUTH_KAKAO_SCOPE")
 
     url = create_redirect_uri_to_authorize(scope)
