@@ -17,11 +17,13 @@ import requests
 from umatter.settings import BASE_URL
 from .utils import auth_user
 from .services import (
-    create_redirect_uri_for_kakao,
+    create_redirect_uri_to_authorize,
     create_user_with_kakao_info,
-    delete_cookies_for_logout,
-    get_user_by_kakao_id,
+    delete_cookies,
     get_access_token_by_refresh_token,
+    get_access_token_from_kakao,
+    get_kakao_info_with_access_token,
+    get_user_by_kakao_id,
     logout_and_remove_token,
     set_cookies_for_login,
     update_kakao_refresh_token,
@@ -32,67 +34,50 @@ logger = logging.getLogger("user.views")
 
 def kakao_login(request):
 
+    # TODO: how to clear cookies remains when the server is down
     scope = get_env("AUTH_KAKAO_SCOPE")
 
-    base_url = "https://kauth.kakao.com/oauth/authorize"
-    params = {
-        "response_type": "code",
-        "scope": scope,
-    }
-    url = create_redirect_uri_for_kakao(base_url, params)
-    return redirect(url)
+    url = create_redirect_uri_to_authorize(scope)
+    rsp = HttpResponseRedirect(url)
+
+    # if cookies remains, clean all the cookies
+    logger.info(rsp.__dict__)
+    delete_cookies(rsp)
+
+    # return redirect(url)
+    return rsp
 
 
 def kakao_callback(request):
     code = request.GET.get("code")
 
     # code로 access token 요청
-    base_url = "https://kauth.kakao.com/oauth/token"
-    params = {
-        "grant_type": "authorization_code",
-        "code": code,
-    }
-    url = create_redirect_uri_for_kakao(base_url, params)
-
-    token_request = requests.get(url)
-    token_response_json = token_request.json()
-    logger.info(f"token_response_json: {token_response_json}")
-
-    # 에러 발생 시 중단
-    err = token_response_json.get("error", None)
-    if err is not None:
-        logger.error(tb.format_exc())
+    kakao_rsp = get_access_token_from_kakao(code)
+    if kakao_rsp is None:
         return JsonResponse(
             {'msg': 'failed to get user infor from kakao'},
             status=status.HTTP_400_BAD_REQUEST
         )
 
-    access_token = token_response_json.get("access_token")
-    refresh_token = token_response_json.get("refresh_token")
-    # logger.info(f"kakao access token: {access_token}")
+    access_token = kakao_rsp["access_token"]
+    refresh_token = kakao_rsp["refresh_token"]
 
     # access token으로 카카오톡 프로필 요청
-    res = requests.post(
-        "https://kapi.kakao.com/v2/user/me",
-        headers={"Authorization": f"Bearer {access_token}"},
-        timeout=10,
-    )
-    kakao_res = res.json()
-    logger.info(f"profile: {kakao_res}")
+    rsp = get_kakao_info_with_access_token(access_token)
 
-    kakao_id = kakao_res.get("id", None)
-    kakao_account = kakao_res.get("kakao_account", None)
-    email = kakao_account.get("email", None) # 이메일!
-    kakao_profile = kakao_account.get("profile", None) # kakao profile!
-    if kakao_profile is None:
-        logger.error(f"return value from kakao: {kakao_res}")
+    if rsp["kakao_profile"] is None:
+        logger.error(
+            f"return value from kakao: {rsp['kakao_rsp']}"
+        )
         return JsonResponse(
             {'msg': 'failed to find kakao account profile'},
             status=status.HTTP_400_BAD_REQUEST
         )
 
-    kakao_nickname = kakao_profile.get("nickname", None) # 닉네임!
-    profile_thumbnail = kakao_profile.get("thumbnail_image_url", None) # kakao thumbnail image!
+    kakao_id = rsp["kakao_id"]
+    email = rsp["email"]
+    kakao_nickname = rsp["kakao_nickname"]
+    profile_thumbnail = rsp["profile_thumbnail"]
 
     if kakao_id is None:
         return JsonResponse(
@@ -148,13 +133,18 @@ class KakaoLogin(SocialLoginView):
 
 
 def kakao_logout(request):
+    
+    is_logged_in = request.COOKIES.get("isLoggedIn")
     refresh_token = request.COOKIES.get("refreshToken")
-    logger.info(f"refresh token for logout: {refresh_token}")
-    logout_and_remove_token(refresh_token=refresh_token)
-    rsp = HttpResponseRedirect('/')
-    rsp = delete_cookies_for_logout(rsp)
+    if is_logged_in:
+        logger.info(f"refresh token for logout: {refresh_token}")
+        logout_and_remove_token(refresh_token=refresh_token)
+        rsp = HttpResponseRedirect('/')
+        rsp = delete_cookies(rsp)
 
-    return rsp
+        return rsp
+
+    return redirect('/')
 
 
 @auth_user
