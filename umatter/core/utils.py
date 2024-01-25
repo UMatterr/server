@@ -18,7 +18,10 @@ class FilePermissionError(Exception):
 
 quote_match = re.compile(r'''[^"]*"(.+)"''').match
 match_setting = re.compile(r'^(?P<name>[A-Z][A-Z_0-9]+)\s?=\s?(?P<value>.*)').match
-aliases = {'true': True, 'on': True, 'false': False, 'off': False}
+aliases = {
+    'true': True, 'on': True, 'false': False, 'off': False
+}
+
 def load_env(path: Path):
     """
     >>>

@@ -61,6 +61,10 @@ class User(AbstractBaseUser, PermissionsMixin, TimestampModel):
         max_length=255,
         unique=True,
     )
+    kakao_refresh_token = models.CharField(
+        max_length=500,
+        unique=True,
+    )
     # if it's not an empty string, it will show
     username = models.CharField(
         max_length=255,
@@ -89,3 +93,28 @@ class User(AbstractBaseUser, PermissionsMixin, TimestampModel):
 
     class Meta:
         db_table = 'user'
+
+
+class LoginLog(models.Model):
+    log_choices = [
+        ('i', 'login'),
+        ('o', 'logout'),
+    ]
+    id = models.UUIDField(
+        primary_key=True,
+        default=uuid.uuid4,
+        editable=False,
+    )
+    user = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE
+    )
+    login_type = models.CharField(
+        max_length=1,
+        choices=log_choices,
+        default='o'
+    )
+    created = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        db_table = 'login_log'
