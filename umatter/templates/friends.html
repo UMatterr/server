@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>test</title>
+</head>
+<body>
+    <h1>test</h1>
+    <div>
+        <div>
+            <a href="{% url 'home' %}">
+                홈
+                {% url 'home' %}
+            </a>
+            <a href="{% url 'kakao_refresh' %}">
+                카카오 리프레쉬
+                {% url 'kakao_refresh' %}
+            </a>
+        </div>
+        <div>
+            <span>cookie list</span>
+            <span id="cookie">nothing</span>
+        </div>
+    </div>
+</body>
+<script>
+    let cookie = decodeURIComponent(document.cookie).split(';');
+    console.log(cookie)
+    document.getElementById('cookie').innerText = cookie || 'not found';
+</script>
+</html>

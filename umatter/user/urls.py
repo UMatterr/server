@@ -1,20 +1,35 @@
 from django.urls import path
 
-from .views import kakao_login, kakao_callback, KakaoLogin, RegisterAPIView 
-
-
+from .views import (
+    kakao_callback,
+    kakao_login,
+    kakao_logout,
+    refresh_kakao_access_token,
+    KakaoLogin,
+    # RegisterAPIView 
+)
 
 
 urlpatterns = [
+    # path(
+    #     route='register',
+    #     view=RegisterAPIView.as_view(),
+    #     name='register'
+    # ),
     path(
-        route='register',
-        view=RegisterAPIView.as_view(),
-        name='register'
-    ),
-    path(
-        route='kakao/login',
+        route='login',
         view=kakao_login,
         name='kakao_login',
+    ),
+    path(
+        route='logout',
+        view=kakao_logout,
+        name='kakao_logout',
+    ),
+    path(
+        route='refresh',
+        view=refresh_kakao_access_token,
+        name='kakao_refresh',
     ),
     path(
         route='kakao/login/callback/',
