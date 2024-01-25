@@ -13,7 +13,6 @@ from allauth.socialaccount.providers.kakao import views as kakao_view
 from allauth.socialaccount.providers.oauth2.client import OAuth2Client
 from rest_framework import status
 
-import requests
 from umatter.settings import BASE_URL
 from .utils import auth_user
 from .services import (
@@ -34,17 +33,11 @@ logger = logging.getLogger("user.views")
 
 def kakao_login(request):
 
-    # TODO: how to clear cookies remains when the server is down
     scope = get_env("AUTH_KAKAO_SCOPE")
 
     url = create_redirect_uri_to_authorize(scope)
     rsp = HttpResponseRedirect(url)
 
-    # if cookies remains, clean all the cookies
-    logger.info(rsp.__dict__)
-    delete_cookies(rsp)
-
-    # return redirect(url)
     return rsp
 
 
@@ -133,7 +126,7 @@ class KakaoLogin(SocialLoginView):
 
 
 def kakao_logout(request):
-    
+
     is_logged_in = request.COOKIES.get("isLoggedIn")
     refresh_token = request.COOKIES.get("refreshToken")
     if is_logged_in:
