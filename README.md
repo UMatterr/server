@@ -9,27 +9,49 @@ Please ask the config.tar.gz file from @HoonHenry
 tar zxvf config.tar.gz
 ```
 
-> 📦server
->  ┣ 📂.github
->  ┣ 📂config     # tar the gz file and pur the folder here
->  ┃ ┣ 📂django
->  ┃ ┃ ┣ 📜.env
->  ┃ ┃ ┣ 📜.env-dev
->  ┃ ┃ ┣ 📜.env-local
->  ┃ ┃ ┗ 📜requirements.txt
->  ┃ ┗ 📂postgres
->  ┃ ┃ ┣ 📜.env
->  ┃ ┃ ┗ 📜.env-dev
->  ┣ 📂umatter
->  ┣ 📜.gitignore
->  ┣ 📜Dockerfile
->  ┣ 📜README.md
->  ┣ 📜clean_containers.sh
->  ┣ 📜docker-compose-dev.yaml
->  ┣ 📜docker-compose.yaml
->  ┣ 📜entrypoint.sh
->  ┣ 📜restart_web.sh
->  ┗ 📜run_web.sh
+📦server
+
+ ┣ 📂.github
+
+ ┣ 📂config     # tar the gz file and pur the folder here
+
+ ┃ ┣ 📂django
+
+ ┃ ┃ ┣ 📜.env
+
+ ┃ ┃ ┣ 📜.env-dev
+
+ ┃ ┃ ┣ 📜.env-local
+
+ ┃ ┃ ┗ 📜requirements.txt
+ 
+ ┃ ┗ 📂postgres
+
+ ┃ ┃ ┣ 📜.env
+
+ ┃ ┃ ┗ 📜.env-dev
+
+ ┣ 📂umatter
+
+ ┣ 📜.gitignore
+
+ ┣ 📜Dockerfile
+
+ ┣ 📜README.md
+
+ ┣ 📜check_db.sh
+
+ ┣ 📜clean_containers.sh
+
+ ┣ 📜docker-compose-dev.yaml
+
+ ┣ 📜docker-compose.yaml
+
+ ┣ 📜entrypoint.sh
+
+ ┣ 📜restart_web.sh
+
+ ┗ 📜run_web.sh
 
 ## Run the web server and db
 
