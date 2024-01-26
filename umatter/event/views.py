@@ -1,18 +1,13 @@
-import logging
-
 from rest_framework.views import APIView
 from rest_framework.response import Response
 
-from event.models import Event, EventType, Friend
-from event.serializers import EventSerializer, EventTypeSerializer
-from user.utils import auth_user
-from .models import Friend
-from .serializers import FriendSerializer
+from .models import Event, EventType, Friend
+from .serializers import EventSerializer, EventTypeSerializer, FriendSerializer
+import logging
 
 
 logger = logging.getLogger(__name__)
 
-@auth_user
 class EventListView(APIView):
     def get(self, request):
         events = Event.objects.all()
@@ -20,7 +15,6 @@ class EventListView(APIView):
         return Response(serializer.data)
 
 
-@auth_user
 class EventDetailView(APIView):
     def get(self, request):
         event = Event.objects.get(id=request.id)
@@ -39,18 +33,4 @@ class EventTypeDetailView(APIView):
     def get(self, request):
         event_type = EventType.objects.get(id=request.id)
         serializer = EventTypeSerializer(event_type, many=True)
-        return Response(serializer.data)
-
-
-class FriendListView(APIView):
-    def get(self, request):
-        friends = Friend.objects.all()
-        serializer = FriendSerializer(friends, many=True)
-        return Response(serializer.data)
-
-
-class FriendDetailView(APIView):
-    def get(self, request):
-        friend = Friend.objects.get(id=request.id)
-        serializer = FriendSerializer(friend, many=True)
         return Response(serializer.data)

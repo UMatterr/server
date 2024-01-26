@@ -22,7 +22,9 @@ from core.views import home, friends
 
 urlpatterns = [
     path('', home, name='home'),
-    path('friends/', friends, name='friends'),
     path('admin/', admin.site.urls),
     path('auth/', include('user.urls')),
+    # path('friends/', friends, name='friends'),
+    path('friends/', include('friend.urls')),
+    path('events/', include('event.urls')),
 ]

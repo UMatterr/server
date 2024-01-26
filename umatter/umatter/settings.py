@@ -31,7 +31,9 @@ SECRET_KEY = get_env("DJANGO_SECRET_KEY", "secret")
 DEBUG = get_env("DJANGO_DEBUG", "False") == "True"
 
 ALLOWED_HOSTS = get_env("DJANGO_ALLOWED_HOSTS", "").split()
+CORS_ALLOWED_HOSTS = get_env("DJANGO_CORS_ALLOWED_HOSTS", "").split()
 BASE_URL = get_env("DJANGO_BASE_URL", "")
+CLIENT_BASE_URL = get_env("DJANGO_CLIENT_BASE_URL", "")
 
 # Application definition
 INSTALLED_APPS = [
@@ -43,9 +45,10 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'django.contrib.sites',
 
-    'user',
+    'event',
     'friend',
     'message',
+    'user',
 
     'rest_framework',
     'rest_framework.authtoken',
@@ -55,6 +58,9 @@ INSTALLED_APPS = [
     'allauth.account',
     'allauth.socialaccount',
     'allauth.socialaccount.providers.kakao',
+    
+    # cors
+    'corsheaders',
 ]
 
 MIDDLEWARE = [
@@ -68,6 +74,10 @@ MIDDLEWARE = [
 
     # Add the account middleware:
     "allauth.account.middleware.AccountMiddleware",
+
+    # cors
+    "corsheaders.middleware.CorsMiddleware",
+    "django.middleware.common.CommonMiddleware",
 ]
 
 ROOT_URLCONF = 'umatter.urls'
@@ -204,6 +214,14 @@ LOGGING = {
         },
         # app logger
         "user": {
+            "handlers": ["verbose"],
+            "level": "INFO",
+        },
+        "event": {
+            "handlers": ["verbose"],
+            "level": "INFO",
+        },
+        "friend": {
             "handlers": ["verbose"],
             "level": "INFO",
         },
