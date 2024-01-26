@@ -9,6 +9,7 @@ Please ask the config.tar.gz file from @HoonHenry
 tar zxvf config.tar.gz
 ```
 
+```bash
 📦server
  ┣ 📂.github
  ┣ 📂config     # tar the gz file and pur the folder here
@@ -31,6 +32,7 @@ tar zxvf config.tar.gz
  ┣ 📜entrypoint.sh
  ┣ 📜restart_web.sh
  ┗ 📜run_web.sh
+```
 
 ## Run the web server and db
 
