@@ -3,7 +3,7 @@ import uuid
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser,  BaseUserManager, PermissionsMixin
 
-from core.models import TimestampModel
+from core.models import IDModel, TimestampModel
 
 
 class UserManager(BaseUserManager):
@@ -35,15 +35,10 @@ class UserManager(BaseUserManager):
         return self.create_user(username, email, password, **extra_fields)
 
 
-class User(AbstractBaseUser, PermissionsMixin, TimestampModel):
+class User(AbstractBaseUser, PermissionsMixin, IDModel, TimestampModel):
 
     objects = UserManager()
 
-    id = models.UUIDField(
-        primary_key=True,
-        default=uuid.uuid4,
-        editable=False,
-    )
     kakao_id = models.CharField(
         max_length=255,
         unique=True,

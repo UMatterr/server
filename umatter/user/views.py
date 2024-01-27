@@ -13,7 +13,7 @@ from allauth.socialaccount.providers.kakao import views as kakao_view
 from allauth.socialaccount.providers.oauth2.client import OAuth2Client
 from rest_framework import status
 
-from umatter.settings import BASE_URL
+from umatter.settings import BASE_URL, CLIENT_BASE_URL
 from .utils import auth_user
 from .services import (
     create_redirect_uri_to_authorize,
@@ -108,13 +108,13 @@ def kakao_callback(request):
             kakao_refresh_token=refresh_token,
         )
 
-    rsp = HttpResponseRedirect('/')
+    rsp = HttpResponseRedirect(CLIENT_BASE_URL)
     rsp = set_cookies_for_login(
         rsp,
         access_token,
         refresh_token,
     )
-    logger.info(f"rsp: {rsp.__dict__}")
+    # logger.info(f"rsp: {rsp.__dict__}")
 
     return rsp
 
@@ -132,19 +132,19 @@ def kakao_logout(request):
     if is_logged_in:
         logger.info(f"refresh token for logout: {refresh_token}")
         logout_and_remove_token(refresh_token=refresh_token)
-        rsp = HttpResponseRedirect('/')
+        rsp = HttpResponseRedirect(CLIENT_BASE_URL)
         rsp = delete_cookies(rsp)
 
         return rsp
 
-    return redirect('/')
+    return redirect(CLIENT_BASE_URL)
 
 
 @auth_user
 def refresh_kakao_access_token(request):
     refresh_token = request.COOKIES.get("refreshToken")
     access_token = get_access_token_by_refresh_token(refresh_token)
-    rsp = HttpResponseRedirect('/')
+    rsp = HttpResponseRedirect(CLIENT_BASE_URL)
     rsp = set_cookies_for_login(
         rsp=rsp,
         access_token=access_token,
