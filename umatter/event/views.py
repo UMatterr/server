@@ -1,9 +1,10 @@
+import logging
+
 from rest_framework.views import APIView
 from rest_framework.response import Response
 
-from .models import Event, EventType, Friend
-from .serializers import EventSerializer, EventTypeSerializer, FriendSerializer
-import logging
+from .models import Event, EventType
+from .serializers import EventSerializer, EventTypeSerializer
 
 
 logger = logging.getLogger(__name__)

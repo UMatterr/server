@@ -1,7 +1,7 @@
 from django.urls import path
 
 from .views import (
-    FriendDetailView,
+    FriendView,
     FriendListView,
 )
 
@@ -14,7 +14,7 @@ urlpatterns = [
     ),
     path(
         route='info/<uuid>',
-        view=FriendDetailView.as_view(),
+        view=FriendView.as_view(),
         name='friend_detail'
     ),
 ]
