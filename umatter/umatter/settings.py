@@ -28,10 +28,11 @@ load_env(BASE_DIR / "../config/django/.env-local")
 SECRET_KEY = get_env("DJANGO_SECRET_KEY", "secret")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = get_env("DJANGO_DEBUG", "False") == "True"
+DEBUG = bool(get_env("DJANGO_DEBUG", "False"))
 
 ALLOWED_HOSTS = get_env("DJANGO_ALLOWED_HOSTS", "").split()
-CORS_ALLOWED_HOSTS = get_env("DJANGO_CORS_ALLOWED_HOSTS", "").split()
+CORS_ORIGIN_WHITELIST = get_env("DJANGO_CORS_ORIGIN_WHITELIST", "").split()
+CORS_ORIGIN_ALLOW_ALL = bool(get_env("DJANGO_CORS_ORIGIN_ALLOW_ALL", False))
 BASE_URL = get_env("DJANGO_BASE_URL", "")
 CLIENT_BASE_URL = get_env("DJANGO_CLIENT_BASE_URL", "")
 
