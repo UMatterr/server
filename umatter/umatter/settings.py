@@ -19,19 +19,17 @@ from core.utils import load_env, get_env
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-# here you indicate where your .env file is
-load_env(BASE_DIR / "../config/django/.env-local")
-
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = get_env("DJANGO_SECRET_KEY", "secret")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = get_env("DJANGO_DEBUG", "False") == "True"
+DEBUG = bool(get_env("DJANGO_DEBUG", "False"))
 
 ALLOWED_HOSTS = get_env("DJANGO_ALLOWED_HOSTS", "").split()
-CORS_ALLOWED_HOSTS = get_env("DJANGO_CORS_ALLOWED_HOSTS", "").split()
+CORS_ORIGIN_WHITELIST = get_env("DJANGO_CORS_ORIGIN_WHITELIST", "").split()
+CORS_ORIGIN_ALLOW_ALL = bool(get_env("DJANGO_CORS_ORIGIN_ALLOW_ALL", False))
 BASE_URL = get_env("DJANGO_BASE_URL", "")
 CLIENT_BASE_URL = get_env("DJANGO_CLIENT_BASE_URL", "")
 

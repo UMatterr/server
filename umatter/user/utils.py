@@ -2,6 +2,7 @@ import logging
 import traceback as tb
 from functools import wraps
 
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import (
     HttpResponse,
     HttpResponseBadRequest,
@@ -88,4 +89,7 @@ def auth_user(f):
 
     return wrapper
 
+
+class AuthUserMixin(LoginRequiredMixin):
+    pass
             
