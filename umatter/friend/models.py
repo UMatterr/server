@@ -1,20 +1,18 @@
+from django.core.validators import MaxLengthValidator
 from django.db import models
 
-from core.models import IDModel, TimestampModel
+from core.models import IDModel, PhoneModel, TimestampModel
 from user.models import User
 
 
-class Friend(IDModel, TimestampModel):
+class Friend(IDModel, PhoneModel, TimestampModel):
     user = models.ForeignKey(
         User,
         on_delete=models.CASCADE
     )
     name = models.CharField(
-        max_length=255,
-    )
-    phone_number = models.CharField(
-        max_length=20,
-        null=True,
+        max_length=250,
+        validators=[MaxLengthValidator(250)],
     )
     birthday = models.DateField(
         null=True,

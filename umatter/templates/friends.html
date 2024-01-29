@@ -17,10 +17,28 @@
                 카카오 리프레쉬
                 {% url 'kakao_refresh' %}
             </a>
+            <a href="{% url 'kakao_logout' %}">
+                홈
+                {% url 'kakao_logout' %}
+            </a>
         </div>
         <div>
             <span>cookie list</span>
             <span id="cookie">nothing</span>
+        </div>
+        <div>
+            <form method="post">
+                {% csrf_token %}
+                {{ form.as_p }}
+                <button type="submit">Submit</button>
+            </form>
+            
+            <ul>
+                {% for object in object_list %}
+                <li>{{ object }}</li>
+                {% endfor %}
+            </ul>
+
         </div>
     </div>
 </body>
