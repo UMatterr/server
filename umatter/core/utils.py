@@ -2,18 +2,7 @@
 import logging
 import os
 import re
-# import traceback as tb
-# from functools import wraps
 from pathlib import Path
-
-# from django.http import HttpResponse, HttpResponseBadRequest
-# from django.shortcuts import get_object_or_404
-
-# from user.models import User
-# from user.services import get_access_token_by_refresh_token, verify_access_token
-
-
-logger = logging.getLogger(__name__)
 
 def get_env(key: str, default=None) -> str:
     """
