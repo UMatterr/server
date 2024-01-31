@@ -28,6 +28,7 @@ def get_or_post_friend(request):
     logger.info(
         f"user kakao id: {kakao_id}, {access_token}, {refresh_token}"
     )
+    user = request.user
     if request.method == 'GET':
         friends = Friend.objects.all()
         data = FriendSerializer(friends, many=True).data
@@ -40,7 +41,7 @@ def get_or_post_friend(request):
         return Response(data, status=status.HTTP_200_OK)
 
     if request.method == 'POST':
-        logger.info(f"{request.body}, {type(request.user)}")
+        logger.info(f"{request.body}, {user}")
         data = json.loads(request.body)
         try:
             name = data['name']
@@ -53,12 +54,12 @@ def get_or_post_friend(request):
             )
 
         friend = Friend(
-            user_id=request.user.id,
+            user_id=user.id,
             name=name,
         )
         friend.save()
         friends = Friend.objects.filter(
-            user_id=request.user.id
+            user_id=user.id
         )
         data = FriendSerializer(friends, many=True).data
         logger.info(f"Updated friends: {data}")
