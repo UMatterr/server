@@ -1,8 +1,19 @@
 # ref: https://gist.github.com/josuedjh3/38c521c9091b5c268f2a4d5f3166c497
+import logging
 import os
 import re
+# import traceback as tb
+# from functools import wraps
 from pathlib import Path
 
+# from django.http import HttpResponse, HttpResponseBadRequest
+# from django.shortcuts import get_object_or_404
+
+# from user.models import User
+# from user.services import get_access_token_by_refresh_token, verify_access_token
+
+
+logger = logging.getLogger(__name__)
 
 def get_env(key: str, default=None) -> str:
     """
@@ -16,16 +27,17 @@ class FilePermissionError(Exception):
     pass
 
 
-quote_match = re.compile(r'''[^"]*"(.+)"''').match
-match_setting = re.compile(r'^(?P<name>[A-Z][A-Z_0-9]+)\s?=\s?(?P<value>.*)').match
-aliases = {
-    'true': True, 'on': True, 'false': False, 'off': False
-}
-
 def load_env(path: Path):
     """
     >>>
     """
+    quote_match = re.compile(r'''[^"]*"(.+)"''').match
+    match_setting = re.compile(r'^(?P<name>[A-Z][A-Z_0-9]+)\s?=\s?(?P<value>.*)').match
+    aliases = {
+        'true': True, 'on': True,
+        'false': False, 'off': False
+    }
+
     if not path.exists():
         return
 
@@ -66,4 +78,3 @@ def load_env(path: Path):
 
         # Set environment value
         os.environ[name] = value
-        

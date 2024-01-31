@@ -1,3 +1,4 @@
+from django.core.validators import MaxLengthValidator
 from django.db import models
 
 from core.models import IDModel, TimestampModel
@@ -6,7 +7,8 @@ from friend.models import Friend
 
 class EventType(IDModel):
     name = models.CharField(
-        max_length=255,
+        max_length=250,
+        validators=[MaxLengthValidator(250)],
     )
 
     class Meta:
@@ -15,7 +17,8 @@ class EventType(IDModel):
 
 class Event(IDModel, TimestampModel):
     name = models.CharField(
-        max_length=255,
+        max_length=250,
+        validators=[MaxLengthValidator(250)],
     )
     friend = models.ManyToManyField(
         Friend,

@@ -1,20 +1,29 @@
 from django.urls import path
 
 from .views import (
-    FriendView,
-    FriendListView,
+    get_or_post_friend,
 )
 
 
 urlpatterns = [
     path(
         route='',
-        view=FriendListView.as_view(),
-        name='friend_list'
+        view=get_or_post_friend,
+        name='friends'
     ),
-    path(
-        route='info/<str:uuid>',
-        view=FriendView.as_view(),
-        name='friend_detail'
-    ),
+    # path(
+    #     route='<str:uuid>',
+    #     view=get_friend_info,
+    #     name='get_friend_info'
+    # ),
+    # path(
+    #     route='<str:uuid>',
+    #     view=update_friend_info,
+    #     name='update_friend_info'
+    # ),
+    # path(
+    #     route='<str:uuid>',
+    #     view=delete_friend,
+    #     name='delete_friend'
+    # ),
 ]

@@ -4,8 +4,6 @@ from urllib.parse import urlencode
 
 import requests
 
-from django.http import HttpResponse
-
 from core.utils import get_env
 from umatter.settings import BASE_URL
 from .models import User, LoginLog
@@ -235,5 +233,5 @@ def verify_access_token(access_token):
     status_code = rsp.status_code
     rsp = rsp.json()
     logger.info(f"return value from kakao: {rsp}")
-    
+
     return rsp, status_code
