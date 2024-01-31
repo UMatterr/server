@@ -31,16 +31,20 @@ load_env(BASE_DIR / "../config/django/.env-local")
 SECRET_KEY = get_env("DJANGO_SECRET_KEY", "secret")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = bool(get_env("DJANGO_DEBUG", "False"))
+DEBUG = get_env("DJANGO_DEBUG", 'true') == "true"
 
 ALLOWED_HOSTS = get_env("DJANGO_ALLOWED_HOSTS", "").split()
-CORS_ALLOW_CREDENTIALS = bool(get_env("DJANGO_CORS_ALLOW_CREDENTIALS", False))
-CORS_ORIGIN_ALLOW_ALL = bool(get_env("DJANGO_CORS_ORIGIN_ALLOW_ALL", False))
+ACCESS_CONTROL_ALLOW_HEADERS = list(default_headers) + \
+    get_env("DJANGO_ACCESS_CONTROL_ALLOW_HEADERS", "").split()
+ACCESS_CONTROL_ALLOW_METHODS = list(default_methods) + \
+    get_env("DJANGO_ACCESS_CONTROL_ALLOW_METHODS", "").split()
+CORS_ALLOW_CREDENTIALS = get_env("DJANGO_CORS_ALLOW_CREDENTIALS", 'true') == 'true'
+CORS_ORIGIN_ALLOW_ALL = get_env("DJANGO_CORS_ORIGIN_ALLOW_ALL", 'false') == 'true'
 CORS_ORIGIN_WHITELIST = get_env("DJANGO_CORS_ORIGIN_WHITELIST", "").split()
-CSRF_COOKIE_HTTPONLY = bool(get_env("DJANGO_CSRF_COOKIE_HTTPONLY", False))
+CSRF_COOKIE_HTTPONLY = get_env("DJANGO_CSRF_COOKIE_HTTPONLY", 'true') == 'true'
 CSRF_TRUSTED_ORIGINS = get_env("DJANGO_CSRF_TRUSTED_ORIGINS", "").split()
-CSRF_USE_SESSIONS = bool(get_env("DJANGO_CSRF_USE_SESSIONS", False))
-SESSION_COOKIE_HTTPONLY = bool(get_env("DJANGO_SESSION_COOKIE_HTTPONLY", True))
+CSRF_USE_SESSIONS = get_env("DJANGO_CSRF_USE_SESSIONS", 'true') == 'true'
+SESSION_COOKIE_HTTPONLY = get_env("DJANGO_SESSION_COOKIE_HTTPONLY", 'true') == 'true'
 
 BASE_URL = get_env("DJANGO_BASE_URL", "")
 CLIENT_BASE_URL = get_env("DJANGO_CLIENT_BASE_URL", "")
@@ -68,7 +72,7 @@ INSTALLED_APPS = [
     'allauth.account',
     'allauth.socialaccount',
     'allauth.socialaccount.providers.kakao',
-    
+
     # cors
     'corsheaders',
 ]
@@ -223,15 +227,15 @@ LOGGING = {
             "propagate": False,
         },
         # app logger
-        "user": {
-            "handlers": ["verbose"],
-            "level": "INFO",
-        },
         "event": {
             "handlers": ["verbose"],
             "level": "INFO",
         },
         "friend": {
+            "handlers": ["verbose"],
+            "level": "INFO",
+        },
+        "user": {
             "handlers": ["verbose"],
             "level": "INFO",
         },

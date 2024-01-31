@@ -16,6 +16,7 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import include, path, re_path
+from django.views.decorators.csrf import csrf_exempt
 
 from core.views import home, IndexTemplateView
 
@@ -24,7 +25,7 @@ urlpatterns = [
     # path('', home, name='home'),
     path('admin/', admin.site.urls),
     path('auth/', include('user.urls')),
-    path('friends/', include('friend.urls')),
-    path('events/', include('event.urls')),
-    re_path(r'^.*$', IndexTemplateView.as_view(), name='spa-entry-point'),
+    path('friends', include('friend.urls')),
+    # path('events/', csrf_exempt(include('event.urls'))),
+    # re_path(r'^.*$', csrf_exempt(IndexTemplateView.as_view()), name='spa-entry-point'),
 ]

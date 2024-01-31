@@ -29,7 +29,7 @@ def auth_user(f):
                 'Unauthorized',
                 status=401,
             )
-        
+
         try:
             payload, status_code = verify_access_token(access_token)
             logger.info(f"token payload: {status_code}, {payload}")
@@ -50,7 +50,7 @@ def auth_user(f):
                 )
 
         except:
-            logger.error(tb.format_exc())
+            logger.error(f'ERROR: {tb.format_exc()}')
             return HttpResponse(
                 'Unauthorized',
                 status=401,
@@ -61,10 +61,8 @@ def auth_user(f):
             user_info = User.objects.get(
                 kakao_id=payload['id']
             )
-            # request.user = payload['id']
-            request.kakao_id = payload['id']
-            request.access_token = access_token
-            request.refresh_token = refresh_token
+            request.user = user_info
+            logger.info(f"user kakao id: {type(user_info)}")
 
         except User.DoesNotExist:
             logger.error(tb.format_exc())
