@@ -26,20 +26,7 @@
             <span>cookie list</span>
             <span id="cookie">nothing</span>
         </div>
-        <div>
-            <form method="post">
-                {% csrf_token %}
-                {{ form.as_p }}
-                <button type="submit">Submit</button>
-            </form>
-            
-            <ul>
-                {% for object in object_list %}
-                <li>{{ object }}</li>
-                {% endfor %}
-            </ul>
-
-        </div>
+        <div>{{ content }}</div>
     </div>
 </body>
 <script>

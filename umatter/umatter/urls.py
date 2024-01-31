@@ -21,7 +21,7 @@ from core.views import home, IndexTemplateView
 
 
 urlpatterns = [
-    path('', home, name='home'),
+    # path('', home, name='home'),
     path('admin/', admin.site.urls),
     path('auth/', include('user.urls')),
     path('friends/', include('friend.urls')),

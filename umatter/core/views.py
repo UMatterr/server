@@ -3,7 +3,7 @@ import logging
 from django.shortcuts import render
 from django.views.generic.base import TemplateView
 
-from core.utils import auth_user
+# from user.utils import auth_user
 
 logger = logging.getLogger('django')
 

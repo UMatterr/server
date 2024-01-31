@@ -1,7 +1,5 @@
 import logging
-import traceback as tb
 
-from core.utils import get_env
 from django.http import (
     HttpResponseRedirect,
     JsonResponse,
@@ -13,8 +11,9 @@ from allauth.socialaccount.providers.kakao import views as kakao_view
 from allauth.socialaccount.providers.oauth2.client import OAuth2Client
 from rest_framework import status
 
+from core.utils import get_env
 from umatter.settings import BASE_URL, CLIENT_BASE_URL
-from .utils import auth_user
+
 from .services import (
     create_redirect_uri_to_authorize,
     create_user_with_kakao_info,
@@ -27,10 +26,12 @@ from .services import (
     set_cookies_for_login,
     update_kakao_refresh_token,
 )
+from .utils import auth_user, control_request_method
 
 
 logger = logging.getLogger("user.views")
 
+@control_request_method()
 def kakao_login(request):
 
     scope = get_env("AUTH_KAKAO_SCOPE")
@@ -41,6 +42,7 @@ def kakao_login(request):
     return rsp
 
 
+@control_request_method()
 def kakao_callback(request):
     code = request.GET.get("code")
 
@@ -109,6 +111,7 @@ def kakao_callback(request):
         )
 
     rsp = HttpResponseRedirect(CLIENT_BASE_URL + '/friend/info')
+    # rsp = HttpResponseRedirect('/')
     rsp = set_cookies_for_login(
         rsp,
         access_token,
@@ -125,6 +128,7 @@ class KakaoLogin(SocialLoginView):
     client_class = OAuth2Client
 
 
+@control_request_method()
 def kakao_logout(request):
 
     is_logged_in = request.COOKIES.get("isLoggedIn")
@@ -133,6 +137,7 @@ def kakao_logout(request):
         logger.info(f"refresh token for logout: {refresh_token}")
         logout_and_remove_token(refresh_token=refresh_token)
         rsp = HttpResponseRedirect(CLIENT_BASE_URL)
+        # rsp = HttpResponseRedirect('/')
         rsp = delete_cookies(rsp)
 
         return rsp
@@ -141,10 +146,12 @@ def kakao_logout(request):
 
 
 @auth_user
+@control_request_method()
 def refresh_kakao_access_token(request):
     refresh_token = request.COOKIES.get("refreshToken")
     access_token = get_access_token_by_refresh_token(refresh_token)
     rsp = HttpResponseRedirect(CLIENT_BASE_URL)
+    # rsp = HttpResponseRedirect('/')
     rsp = set_cookies_for_login(
         rsp=rsp,
         access_token=access_token,

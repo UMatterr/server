@@ -51,6 +51,7 @@ class KakaoLoginPermission(permissions.BasePermission):
                     'Something went wrong while verifying access token'
                 )
                 return False
+
         except:
             logger.error(tb.format_exc())
             return False
@@ -73,7 +74,7 @@ class KakaoLoginPermission(permissions.BasePermission):
 
         return True
                     
-    def has_object_permission(self, request, view, obj):
-        if request.method == 'GET':
-            return True
-        return False
+    # def has_object_permission(self, request, view, obj):
+    #     if request.method == 'GET':
+    #         return True
+    #     return False
