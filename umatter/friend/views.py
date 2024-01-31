@@ -10,7 +10,6 @@ from rest_framework.response import Response
 
 from user.utils import auth_user, control_request_method
 
-from .forms import FriendForm
 from .models import Friend
 from .serializers import FriendSerializer
 
@@ -22,12 +21,6 @@ logger = logging.getLogger(__name__)
 @control_request_method(method=('GET', 'POST'))
 def get_or_post_friend(request):
 
-    kakao_id = request.user
-    access_token = request.COOKIES.get('access_token')
-    refresh_token = request.COOKIES.get('refresh_token')
-    logger.info(
-        f"user kakao id: {kakao_id}, {access_token}, {refresh_token}"
-    )
     user = request.user
     if request.method == 'GET':
         friends = Friend.objects.filter(user_id=user.id)
@@ -57,13 +50,8 @@ def get_or_post_friend(request):
             name=name,
         )
         friend.save()
-        friends = Friend.objects.filter(
-            user_id=user.id
-        )
-        data = FriendSerializer(friends, many=True).data
-        logger.info(f"Updated friends: {data}")
         return JsonResponse(
-            data,
+            {'friendId': friend.id},
             status=201,
             safe=False
         )
