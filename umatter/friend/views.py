@@ -30,15 +30,14 @@ def get_or_post_friend(request):
     )
     user = request.user
     if request.method == 'GET':
-        friends = Friend.objects.all()
+        friends = Friend.objects.filter(user_id=user.id)
         data = FriendSerializer(friends, many=True).data
-        logger.info(f"friends: {friends}")
         logger.info(f"friends serialized: {data}")
-        # return HttpResponse(
-        #     content=data,
-        #     status=200
-        # )
-        return Response(data, status=status.HTTP_200_OK)
+        return JsonResponse(
+            data,
+            status=200,
+            safe=False
+        )
 
     if request.method == 'POST':
         logger.info(f"{request.body}, {user}")
