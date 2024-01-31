@@ -10,7 +10,6 @@ from rest_framework.response import Response
 
 from user.utils import auth_user, control_request_method
 
-from .forms import FriendForm
 from .models import Friend
 from .serializers import FriendSerializer
 
@@ -24,13 +23,17 @@ def get_or_post_friend(request):
 
     user = request.user
     if request.method == 'GET':
-        friends = Friend.objects.all()
+        friends = Friend.objects.filter(user_id=user.id)
         data = FriendSerializer(friends, many=True).data
-        logger.info(f"friends: {friends}")
         logger.info(f"friends serialized: {data}")
-        return Response(data, status=status.HTTP_200_OK)
+        return JsonResponse(
+            data,
+            status=200,
+            safe=False
+        )
 
     if request.method == 'POST':
+        logger.info(f"{request.body}, {user}")
         data = json.loads(request.body)
         try:
             name = data['name']
@@ -47,13 +50,8 @@ def get_or_post_friend(request):
             name=name,
         )
         friend.save()
-        friends = Friend.objects.filter(
-            user_id=user.id
-        )
-        data = FriendSerializer(friends, many=True).data
-        logger.info(f"Updated friends: {data}")
         return JsonResponse(
-            data,
+            {'friendId': friend.id},
             status=201,
             safe=False
         )
@@ -89,6 +87,7 @@ def get_friend_info(request, uuid):
     return HttpResponse(content=data, status=200)
 
 
+@csrf_exempt
 @auth_user
 @control_request_method(method=('POST'))
 def update_friend_info(request, uuid):
