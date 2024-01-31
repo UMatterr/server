@@ -14,6 +14,9 @@ from datetime import timedelta
 from pathlib import Path
 
 from core.utils import load_env, get_env
+from corsheaders.defaults import (
+    default_headers, default_methods
+)
 
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -25,10 +28,19 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = get_env("DJANGO_SECRET_KEY", "secret")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = get_env("DJANGO_DEBUG", "False") == "True"
+DEBUG = bool(get_env("DJANGO_DEBUG", "False"))
 
 ALLOWED_HOSTS = get_env("DJANGO_ALLOWED_HOSTS", "").split()
+CORS_ALLOW_CREDENTIALS = bool(get_env("DJANGO_CORS_ALLOW_CREDENTIALS", False))
+CORS_ORIGIN_ALLOW_ALL = bool(get_env("DJANGO_CORS_ORIGIN_ALLOW_ALL", False))
+CORS_ORIGIN_WHITELIST = get_env("DJANGO_CORS_ORIGIN_WHITELIST", "").split()
+CSRF_COOKIE_HTTPONLY = bool(get_env("DJANGO_CSRF_COOKIE_HTTPONLY", False))
+CSRF_TRUSTED_ORIGINS = get_env("DJANGO_CSRF_TRUSTED_ORIGINS", "").split()
+CSRF_USE_SESSIONS = bool(get_env("DJANGO_CSRF_USE_SESSIONS", False))
+SESSION_COOKIE_HTTPONLY = bool(get_env("DJANGO_SESSION_COOKIE_HTTPONLY", True))
+
 BASE_URL = get_env("DJANGO_BASE_URL", "")
+CLIENT_BASE_URL = get_env("DJANGO_CLIENT_BASE_URL", "")
 
 # Application definition
 INSTALLED_APPS = [
@@ -40,9 +52,10 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'django.contrib.sites',
 
-    'user',
+    'event',
     'friend',
     'message',
+    'user',
 
     'rest_framework',
     'rest_framework.authtoken',
@@ -52,6 +65,9 @@ INSTALLED_APPS = [
     'allauth.account',
     'allauth.socialaccount',
     'allauth.socialaccount.providers.kakao',
+    
+    # cors
+    'corsheaders',
 ]
 
 MIDDLEWARE = [
@@ -65,6 +81,10 @@ MIDDLEWARE = [
 
     # Add the account middleware:
     "allauth.account.middleware.AccountMiddleware",
+
+    # cors
+    "corsheaders.middleware.CorsMiddleware",
+    "django.middleware.common.CommonMiddleware",
 ]
 
 ROOT_URLCONF = 'umatter.urls'
@@ -204,11 +224,16 @@ LOGGING = {
             "handlers": ["verbose"],
             "level": "INFO",
         },
+        "event": {
+            "handlers": ["verbose"],
+            "level": "INFO",
+        },
+        "friend": {
+            "handlers": ["verbose"],
+            "level": "INFO",
+        },
     },
 }
-
-CSRF_COOKIE_HTTPONLY = True
-SESSION_COOKIE_HTTPONLY = True
 
 AUTH_USER_MODEL = 'user.User'
 
@@ -222,15 +247,12 @@ AUTHENTICATION_BACKENDS = [
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
-    	# 'rest_framework.authentication.SessionAuthentication',
-        # 'rest_framework.authentication.BasicAuthentication'
         'rest_framework_simplejwt.authentication.JWTAuthentication',
     ),
 
     'DEFAULT_PERMISSION_CLASSES': (
         'rest_framework.permissions.IsAuthenticated', # 인증된 사용자만 접근
         'rest_framework.permissions.IsAdminUser', # 관리자만 접근
-        # 'rest_framework.permissions.AllowAny', # 누구나 접근
     ),
 }
 

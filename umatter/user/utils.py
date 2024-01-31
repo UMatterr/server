@@ -2,15 +2,14 @@ import logging
 import traceback as tb
 from functools import wraps
 
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import (
-    HttpResponse,
-    HttpResponseBadRequest,
+    HttpResponse, HttpResponseBadRequest,
+    HttpResponseNotAllowed
 )
-from django.shortcuts import get_object_or_404
 
-from .services import verify_access_token
 from .models import User
-from .services import get_access_token_by_refresh_token
+from .services import get_access_token_by_refresh_token, verify_access_token
 
 
 logger = logging.getLogger(__name__)
@@ -27,7 +26,6 @@ def auth_user(f):
             logger.warning(
                 'There is not an access token or a refresh token'
             )
-            # return HttpResponseRedirect('/auth/login')
             return HttpResponse(
                 'Unauthorized',
                 status=401,
@@ -60,24 +58,27 @@ def auth_user(f):
             )
 
         try:
-            logger.info(f"user id: {payload['id']}")
-            request.user = get_object_or_404(
-                User,
+            logger.info(f"user kakao id: {payload['id']}")
+            user_info = User.objects.get(
                 kakao_id=payload['id']
             )
+            # request.user = payload['id']
+            request.kakao_id = payload['id']
+            request.access_token = access_token
+            request.refresh_token = refresh_token
 
         except User.DoesNotExist:
             logger.error(tb.format_exc())
             return HttpResponseBadRequest(
                 'No user info'
             )
-            
+
         except User.MultipleObjectsReturned:
             logger.error(tb.format_exc())
             return HttpResponseBadRequest(
                 'Multiple user info have returned'
             )
-            
+
         except:
             logger.error(tb.format_exc())
             return HttpResponseBadRequest(
@@ -88,4 +89,13 @@ def auth_user(f):
 
     return wrapper
 
-            
+
+def control_request_method(method=('GET')):
+    def wrapper(func):
+        def _inner(request, *args, **kwargs):
+            logger.info(f"request method: {request.method}")
+            if request.method not in method:
+                return HttpResponseNotAllowed(method)
+            return func(request, *args, **kwargs)
+        return _inner
+    return wrapper

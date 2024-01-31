@@ -1,9 +1,10 @@
 import uuid
 
-from django.db import models
 from django.contrib.auth.models import AbstractBaseUser,  BaseUserManager, PermissionsMixin
+from django.core.validators import EmailValidator, MaxLengthValidator
+from django.db import models
 
-from core.models import TimestampModel
+from core.models import IDModel, PhoneModel, TimestampModel
 
 
 class UserManager(BaseUserManager):
@@ -35,40 +36,41 @@ class UserManager(BaseUserManager):
         return self.create_user(username, email, password, **extra_fields)
 
 
-class User(AbstractBaseUser, PermissionsMixin, TimestampModel):
+class User(AbstractBaseUser, PermissionsMixin, IDModel, PhoneModel, TimestampModel):
 
     objects = UserManager()
 
-    id = models.UUIDField(
-        primary_key=True,
-        default=uuid.uuid4,
-        editable=False,
-    )
     kakao_id = models.CharField(
-        max_length=255,
+        max_length=250,
         unique=True,
         editable=False,
+        validators=[MaxLengthValidator(250)],
     )
     kakao_nickname = models.CharField(
-        max_length=255,
+        max_length=250,
         null=True,
+        validators=[MaxLengthValidator(250)],
     )
     profile_thumbnail = models.SlugField(
         max_length=500,
         null=True,
+        validators=[MaxLengthValidator(500)],
     )
     email = models.EmailField(
-        max_length=255,
+        max_length=250,
         unique=True,
+        validators=[EmailValidator()],
     )
     kakao_refresh_token = models.CharField(
         max_length=500,
         unique=True,
+        validators=[MaxLengthValidator(500)],
     )
     # if it's not an empty string, it will show
     username = models.CharField(
-        max_length=255,
+        max_length=250,
         default="",
+        validators=[MaxLengthValidator(250)],
     )
     is_active = models.BooleanField(
         default=True,
