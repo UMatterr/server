@@ -11,7 +11,10 @@ from rest_framework.response import Response
 from user.utils import auth_user, control_request_method
 
 from .models import Friend
-from .serializers import FriendSerializer
+from .serializers import (
+    FriendDetailSerializer,
+    FriendSerializer,
+)
 
 
 logger = logging.getLogger(__name__)
@@ -65,26 +68,36 @@ def get_or_post_friend(request):
 @csrf_exempt
 @auth_user
 @control_request_method()
-def get_friend_info(request, uuid):
+def get_friend_info(request, pk):
     try:
-        friend = Friend.objects.get(id=uuid)
-        data = FriendSerializer(friend, many=True).data
-        logger.info(f"friend: {friend}")
+        friend = Friend.objects.get(id=pk)
+        data = FriendDetailSerializer(friend).data
         logger.info(f"friend serialized: {data}")
 
     except Friend.DoesNotExist:
-        return Response(
-            {'Not found'},
-            status=status.HTTP_404_NOT_FOUND
+        return HttpResponse(
+            content={'Not found'},
+            status=404
         )
 
     except Friend.MultipleObjectsReturned:
-        return Response(
-            {'Not found'},
-            status=status.HTTP_404_NOT_FOUND
+        return HttpResponse(
+            content={'Too many objects'},
+            status=400
         )
 
-    return HttpResponse(content=data, status=200)
+    except:
+        logger.error(tb.format_exc())
+        return HttpResponse(
+            content={'Too many objects'},
+            status=400
+        )
+
+    return JsonResponse(
+        data,
+        status=200,
+        safe=False
+    )
 
 
 @csrf_exempt
