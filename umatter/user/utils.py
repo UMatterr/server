@@ -5,7 +5,7 @@ from functools import wraps
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import (
     HttpResponse, HttpResponseBadRequest,
-    HttpResponseNotAllowed
+    HttpResponseNotAllowed, HttpResponseNotFound,
 )
 
 from .models import User
@@ -67,7 +67,7 @@ def auth_user(f):
 
         except User.DoesNotExist:
             logger.error(tb.format_exc())
-            return HttpResponseBadRequest(
+            return HttpResponseNotFound(
                 'No user info'
             )
 

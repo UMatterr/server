@@ -4,7 +4,7 @@ import traceback as tb
 
 from django.http import (
     HttpResponse, HttpResponseBadRequest,
-    JsonResponse,
+    HttpResponseNotFound, JsonResponse,
 )
 from django.views.decorators.csrf import csrf_exempt
 
@@ -22,22 +22,14 @@ logger = logging.getLogger(__name__)
 
 @csrf_exempt
 @auth_user
-@control_request_method(method=('GET', 'POST'))
+@control_request_method()
 def get_or_post_event(request):
 
     user = request.user
-    if request.method == 'POST':
-        logger.info(request.POST)
-        form = EventForm(request.POST)
-        if form.is_valid():
-            form.save()
-            return HttpResponse(content={'Saved'}, status=200)
-        return HttpResponse(content={'Not valid'}, status=400)
-
     if request.method == 'GET':
-        event = Event.objects.all()
-        data = EventSerializer(event, many=True).data
+        event = Event.objects.filter(user__id=user.id)
         logger.info(f"event: {event}")
+        data = EventSerializer(event, many=True).data
         logger.info(f"event serialized: {data}")
         return HttpResponse(content=data, status=200)
 
@@ -52,7 +44,7 @@ def delete_event(request, uuid):
         event.delete()
 
     except Event.DoesNotExist:
-        return HttpResponseBadRequest(
+        return HttpResponseNotFound(
             content={'No event'},
         )
 
@@ -97,6 +89,7 @@ def get_event_type(request):
 @auth_user
 @control_request_method(method=('POST'))
 def create_event(request):
+    user = request.user
     data = json.loads(request.body)
     logger.info("data: %s", data)
     if data is None:
@@ -118,9 +111,8 @@ def create_event(request):
         repeat = data['repeat']
 
     except EventType.DoesNotExist:
-        return HttpResponseBadRequest(
+        return HttpResponseNotFound(
             content={'No event type'},
-            status=400
         )
 
     except:
@@ -159,6 +151,7 @@ def create_event(request):
     try:
         event = Event(
             name=name,
+            user=user,
             friend=friend,
             event_type=event_type,
             custom_event_type=custom_event_type,

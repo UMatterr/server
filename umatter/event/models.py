@@ -3,6 +3,7 @@ from django.db import models
 
 from core.models import IDModel, TimestampModel
 from friend.models import Friend
+from user.models import User
 
 
 class EventType(models.Model):
@@ -38,6 +39,10 @@ class Event(IDModel, TimestampModel):
     name = models.CharField(
         max_length=250,
         validators=[MaxLengthValidator(250)],
+    )
+    user = models.ForeignKey(
+        User,
+        on_delete=models.DO_NOTHING,
     )
     friend = models.ForeignKey(
         Friend,
