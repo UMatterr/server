@@ -17,6 +17,7 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import include, path
 
+from event.views import get_or_post_event
 from friend.views import get_or_post_friend
 
 
@@ -25,5 +26,6 @@ urlpatterns = [
     path('auth/', include('user.urls')),
     path('friends', get_or_post_friend, name='friends'),
     path('friends/', include('friend.urls')),
-    # path('events/', csrf_exempt(include('event.urls'))),
+    path('etype', include('event.urls')),
+    path('events/', include('event.urls')),
 ]

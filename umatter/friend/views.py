@@ -2,7 +2,10 @@ import json
 import logging
 import traceback as tb
 
-from django.http import HttpResponse, JsonResponse
+from django.http import (
+    HttpResponse, HttpResponseBadRequest,
+    HttpResponseNotFound, JsonResponse,
+)
 from django.views.decorators.csrf import csrf_exempt
 
 from rest_framework import status
@@ -133,15 +136,21 @@ def delete_friend(request, uuid):
         friend.delete()
 
     except Friend.DoesNotExist:
-        return HttpResponse(
-            content={'Not found'}, status=404
+        return HttpResponseNotFound(
+            content={'Not found'}
         )
 
     except Friend.MultipleObjectsReturned:
-        return HttpResponse(
-            content={'Too many objects'}, status=404
+        return HttpResponseBadRequest(
+            content={'Too many objects'}
+        )
+
+    except:
+        logger.error(tb.format_exc())
+        return HttpResponseBadRequest(
+            content={'Unknown error'}
         )
 
     return HttpResponse(
-        content={'Success'}, status=200
+        content={'Success'}, status=204
     )

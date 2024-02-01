@@ -1,15 +1,21 @@
+import json
 import logging
 import traceback as tb
 
-from django.http import HttpResponse
+from django.http import (
+    HttpResponse, HttpResponseBadRequest,
+    JsonResponse,
+)
 from django.views.decorators.csrf import csrf_exempt
 
+from friend.models import Friend
 from user.utils import auth_user, control_request_method
 
 from .forms import EventForm
-from .models import Event, EventType
-from .serializers import EventSerializer, EventTypeSerializer
-from django.http import HttpResponseBadRequest
+from .models import CustomEventType, Event, EventType
+from .serializers import (
+    EventSerializer, EventTypeSerializer,
+)
 
 
 logger = logging.getLogger(__name__)
@@ -49,20 +55,121 @@ def delete_event(request, uuid):
         event = Event.objects.get(id=uuid)
         logger.info(f"event: {event}")
         event.delete()
+
     except Event.DoesNotExist:
         return HttpResponseBadRequest(
             content={'No event'},
-            status=400
         )
+
     except Event.MultipleObjectsReturned:
         return HttpResponseBadRequest(
             content={'Multiple events'},
-            status=400
         )
+
+    except:
+        logger.error(tb.format_exc())
+        return HttpResponseBadRequest(
+            content={'Unknown error'},
+        )
+
+    return HttpResponse(content={'Success'}, status=204)
+
+
+@csrf_exempt
+@auth_user
+@control_request_method()
+def get_event_type(request):
+    try:
+        event_type = EventType.objects.all()
+        data = EventTypeSerializer(event_type, many=True).data
+        logger.info(f"event: {data}")
+
     except:
         logger.error(tb.format_exc())
         return HttpResponseBadRequest(
             content={'Unknown error'},
             status=400
         )
-    return HttpResponse(content={'Success'}, status=200)
+
+    return JsonResponse(
+        data=data,
+        status=200,
+        safe=False,
+    )
+
+
+@csrf_exempt
+@auth_user
+@control_request_method(method=('POST'))
+def create_event(request):
+    data = json.loads(request.body)
+    if data is None:
+        return HttpResponseBadRequest(
+            content={'No data'},
+            status=400
+        )
+
+    try:
+        name = data['name']
+        friend_id = data['friendId']
+        event_type_id = EventType.objects.get(
+            id=int(data['eventTypeId'])
+        )
+        custom_event_type = None
+        date = data['date']
+        repeat = data['repeat']
+
+    except EventType.DoesNotExist:
+        return HttpResponseBadRequest(
+            content={'No event type'},
+            status=400
+        )
+
+    except:
+        logger.error(tb.format_exc())
+        return HttpResponseBadRequest(
+            content={'Unknown error'},
+            status=400
+        )
+
+    if event_type_id.id == 5 and name is None:
+        try:
+            custom_event_type = CustomEventType.objects.get(name=name)
+            logger.info(
+                "Retrieved an existing custom event type: %s",
+                custom_event_type
+            )
+        except CustomEventType.DoesNotExist:
+            custom_event_type = CustomEventType(name=name)
+            custom_event_type.save()
+            logger.info(
+                "Created a new custom event type: %s",
+                custom_event_type
+            )
+    try:
+        event = Event(
+            name=name,
+            friend=friend_id,
+            event_type=event_type_id,
+            custom_event_type=custom_event_type,
+            date=date,
+            repeat=repeat,
+        )
+        event.save()
+        logger.info(
+            "Created a new event: %s",
+            event
+        )
+
+    except:
+        logger.error(tb.format_exc())
+        return HttpResponseBadRequest(
+            content={'Unknown error'},
+            status=400
+        )
+
+    return JsonResponse(
+        data={"eventId": event.id},
+        status=201,
+        safe=False,
+    )

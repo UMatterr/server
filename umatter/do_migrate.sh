@@ -22,4 +22,5 @@ fi
 
 echo executing the user migrations
 ./manage.py makemigrations && \
-./manage.py migrate
+./manage.py migrate && \
+./manage.py loaddata event_initial_data.json

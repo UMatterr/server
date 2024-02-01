@@ -6,9 +6,14 @@ from .models import Event, EventType
 
 class EventTypeSerializer(serializers.ModelSerializer):
 
+    eventTypeId = serializers.SerializerMethodField('get_alternative_name')
+
     class Meta:
         model = EventType
-        fields = '__all__'
+        fields = ['eventTypeId', 'name']
+
+    def get_alternative_name(self, obj):
+        return obj.id
 
 
 class EventSerializer(serializers.ModelSerializer):
