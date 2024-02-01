@@ -76,9 +76,8 @@ def control_friend_info(request, pk):
         friend = Friend.objects.get(id=pk)
 
     except Friend.DoesNotExist:
-        return HttpResponse(
+        return HttpResponseNotFound(
             content={'Not found'},
-            status=404
         )
 
     except Friend.MultipleObjectsReturned:
