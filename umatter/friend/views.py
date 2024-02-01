@@ -70,12 +70,10 @@ def get_or_post_friend(request):
 
 @csrf_exempt
 @auth_user
-@control_request_method()
-def get_friend_info(request, pk):
+@control_request_method(method=('GET', 'DELETE', 'POST'))
+def control_friend_info(request, pk):
     try:
         friend = Friend.objects.get(id=pk)
-        data = FriendDetailSerializer(friend).data
-        logger.info(f"friend serialized: {data}")
 
     except Friend.DoesNotExist:
         return HttpResponse(
@@ -84,73 +82,60 @@ def get_friend_info(request, pk):
         )
 
     except Friend.MultipleObjectsReturned:
-        return HttpResponse(
-            content={'Too many objects'},
-            status=400
-        )
-
-    except:
-        logger.error(tb.format_exc())
-        return HttpResponse(
-            content={'Too many objects'},
-            status=400
-        )
-
-    return JsonResponse(
-        data,
-        status=200,
-        safe=False
-    )
-
-
-@csrf_exempt
-@auth_user
-@control_request_method(method=('POST'))
-def update_friend_info(request, uuid):
-    try:
-        friend = Friend.objects.get(id=uuid)
-        data = FriendSerializer(friend, many=True).data
-        logger.info(f"friend: {friend}")
-        logger.info(f"friend serialized: {data}")
-
-    except Friend.DoesNotExist:
-        return HttpResponse(
-            content={'Not found'}, status=404
-        )
-
-    except Friend.MultipleObjectsReturned:
-        return HttpResponse(
-            content={'Too many objects'}, status=404
-        )
-
-    return HttpResponse(content=data, status=200)
-
-
-@csrf_exempt
-@auth_user
-@control_request_method(method=('DELETE'))
-def delete_friend(request, uuid):
-    try:
-        friend = Friend.objects.get(id=uuid)
-        logger.info(f"friend to delete: {friend}")
-        friend.delete()
-
-    except Friend.DoesNotExist:
-        return HttpResponseNotFound(
-            content={'Not found'}
-        )
-
-    except Friend.MultipleObjectsReturned:
         return HttpResponseBadRequest(
-            content={'Too many objects'}
+            content={'Too many objects'},
         )
 
     except:
         logger.error(tb.format_exc())
         return HttpResponseBadRequest(
-            content={'Unknown error'}
+            content={'Unknown error'},
         )
 
-    return HttpResponse(
-        content={'Success'}, status=204
-    )
+
+    if request.method == 'GET':
+        try:
+            data = FriendDetailSerializer(friend).data
+            logger.info(f"friend serialized: {data}")
+
+        except:
+            logger.error(tb.format_exc())
+            return HttpResponseBadRequest(
+                content={'Unknown error'},
+            )
+
+        return JsonResponse(
+            data,
+            status=200,
+            safe=False
+        )
+
+    if request.method == 'DELETE':
+        try:
+            friend.delete()
+
+        except:
+            logger.error(tb.format_exc())
+            return HttpResponseBadRequest(
+                content={'Unknown error'}
+            )
+
+        return HttpResponse(
+            content={'Success'}, status=204
+        )
+
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body)
+            logger.info("data: %s", data)
+
+        except:
+            logger.error(tb.format_exc())
+            return HttpResponseBadRequest(
+                content={'Unknown error'}
+            )
+
+        return HttpResponse(
+            content={'Success'},
+            status=200
+        )

@@ -90,7 +90,10 @@ def auth_user(f):
 def control_request_method(method=('GET')):
     def wrapper(func):
         def _inner(request, *args, **kwargs):
-            logger.info(f"request method: {request.method}")
+            logger.info(
+                "request method: %s, %s",
+                request.method, method
+            )
             if request.method not in method:
                 return HttpResponseNotAllowed(method)
             return func(request, *args, **kwargs)

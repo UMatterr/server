@@ -31,6 +31,20 @@
       "model": "event.EventType",
       "id": 5,
       "fields": {
+        "name": "제사"
+      }
+    },
+    {
+      "model": "event.EventType",
+      "id": 6,
+      "fields": {
+        "name": "장례"
+      }
+    },
+    {
+      "model": "event.EventType",
+      "id": 7,
+      "fields": {
         "name": "기타"
       }
     }

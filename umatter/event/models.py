@@ -44,8 +44,9 @@ class Event(IDModel, TimestampModel):
         on_delete=models.CASCADE,
         null=True,
     )
-    event_type = models.ManyToManyField(
+    event_type = models.ForeignKey(
         EventType,
+        on_delete=models.DO_NOTHING,
     )
     custom_event_type = models.ForeignKey(
         CustomEventType,

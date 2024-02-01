@@ -25,12 +25,7 @@ logger = logging.getLogger(__name__)
 @control_request_method(method=('GET', 'POST'))
 def get_or_post_event(request):
 
-    kakao_id = request.kakao_id
-    access_token = request.COOKIES.get('access_token')
-    refresh_token = request.COOKIES.get('refresh_token')
-    logger.info(
-        f"user kakao id: {kakao_id}, {access_token}, {refresh_token}"
-    )
+    user = request.user
     if request.method == 'POST':
         logger.info(request.POST)
         form = EventForm(request.POST)
@@ -103,6 +98,7 @@ def get_event_type(request):
 @control_request_method(method=('POST'))
 def create_event(request):
     data = json.loads(request.body)
+    logger.info("data: %s", data)
     if data is None:
         return HttpResponseBadRequest(
             content={'No data'},
@@ -111,8 +107,10 @@ def create_event(request):
 
     try:
         name = data['name']
-        friend_id = data['friendId']
-        event_type_id = EventType.objects.get(
+        friend = Friend.objects.get(
+            id=data['friendId']
+        )
+        event_type = EventType.objects.get(
             id=int(data['eventTypeId'])
         )
         custom_event_type = None
@@ -132,13 +130,20 @@ def create_event(request):
             status=400
         )
 
-    if event_type_id.id == 5 and name is None:
+    if event_type.name == '기타':
+        logger.info("name: %s, %s", name, event_type.name)
+        if name is None:
+            return HttpResponseBadRequest(
+                content={'No event name'},
+            )
+
         try:
             custom_event_type = CustomEventType.objects.get(name=name)
             logger.info(
                 "Retrieved an existing custom event type: %s",
                 custom_event_type
             )
+
         except CustomEventType.DoesNotExist:
             custom_event_type = CustomEventType(name=name)
             custom_event_type.save()
@@ -146,11 +151,16 @@ def create_event(request):
                 "Created a new custom event type: %s",
                 custom_event_type
             )
+        name = custom_event_type.name
+
+    else:
+        name = event_type.name
+
     try:
         event = Event(
             name=name,
-            friend=friend_id,
-            event_type=event_type_id,
+            friend=friend,
+            event_type=event_type,
             custom_event_type=custom_event_type,
             date=date,
             repeat=repeat,
