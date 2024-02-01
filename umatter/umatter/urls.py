@@ -17,9 +17,12 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import include, path
 
+from friend.views import get_or_post_friend
+
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('auth/', include('user.urls')),
-    path('friends', include('friend.urls')),
+    path('friends', get_or_post_friend, name='friends'),
+    path('friends/', include('friend.urls')),
 ]

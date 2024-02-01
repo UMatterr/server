@@ -1,6 +1,8 @@
 import logging
+import traceback as tb
 
 from django.http import HttpResponse
+from django.views.decorators.csrf import csrf_exempt
 
 from user.utils import auth_user, control_request_method
 
@@ -12,6 +14,7 @@ from django.http import HttpResponseBadRequest
 
 logger = logging.getLogger(__name__)
 
+@csrf_exempt
 @auth_user
 @control_request_method(method=('GET', 'POST'))
 def get_or_post_event(request):
@@ -38,6 +41,7 @@ def get_or_post_event(request):
         return HttpResponse(content=data, status=200)
 
 
+@csrf_exempt
 @auth_user
 @control_request_method(method=('DELETE'))
 def delete_event(request, uuid):
@@ -48,6 +52,17 @@ def delete_event(request, uuid):
     except Event.DoesNotExist:
         return HttpResponseBadRequest(
             content={'No event'},
+            status=400
+        )
+    except Event.MultipleObjectsReturned:
+        return HttpResponseBadRequest(
+            content={'Multiple events'},
+            status=400
+        )
+    except:
+        logger.error(tb.format_exc())
+        return HttpResponseBadRequest(
+            content={'Unknown error'},
             status=400
         )
     return HttpResponse(content={'Success'}, status=200)
