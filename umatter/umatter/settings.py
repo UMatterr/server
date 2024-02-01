@@ -9,7 +9,6 @@ https://docs.djangoproject.com/en/4.2/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.2/ref/settings/
 """
-import os
 from datetime import timedelta
 from pathlib import Path
 
@@ -45,6 +44,10 @@ SESSION_COOKIE_HTTPONLY = get_env("DJANGO_SESSION_COOKIE_HTTPONLY", 'true') == '
 
 BASE_URL = get_env("DJANGO_BASE_URL", "")
 CLIENT_BASE_URL = get_env("DJANGO_CLIENT_BASE_URL", "")
+
+FIXTURE_DIRS = [
+    BASE_DIR / "../config/django"
+]
 
 # Application definition
 INSTALLED_APPS = [
@@ -152,7 +155,7 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/4.2/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = 'ko-kr'
 
 TIME_ZONE = get_env("DJANGO_TIMEZONE")
 
