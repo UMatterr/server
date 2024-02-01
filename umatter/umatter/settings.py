@@ -46,7 +46,7 @@ BASE_URL = get_env("DJANGO_BASE_URL", "")
 CLIENT_BASE_URL = get_env("DJANGO_CLIENT_BASE_URL", "")
 
 FIXTURE_DIRS = [
-    BASE_DIR / "../config/django"
+    BASE_DIR / 'fixtures',
 ]
 
 # Application definition
