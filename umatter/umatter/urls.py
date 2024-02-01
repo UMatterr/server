@@ -15,17 +15,15 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import include, path, re_path
-from django.views.decorators.csrf import csrf_exempt
+from django.urls import include, path
 
-from core.views import home, IndexTemplateView
+from friend.views import get_or_post_friend
 
 
 urlpatterns = [
-    # path('', home, name='home'),
     path('admin/', admin.site.urls),
     path('auth/', include('user.urls')),
-    path('friends', include('friend.urls')),
+    path('friends', get_or_post_friend, name='friends'),
+    path('friends/', include('friend.urls')),
     # path('events/', csrf_exempt(include('event.urls'))),
-    # re_path(r'^.*$', csrf_exempt(IndexTemplateView.as_view()), name='spa-entry-point'),
 ]
