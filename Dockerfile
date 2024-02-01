@@ -16,6 +16,10 @@ RUN pip install --upgrade pip
 COPY ./config/django/requirements.txt .
 RUN pip install -r requirements.txt
 
+# copy initial data for django
+RUN mkdir fixtures
+COPY ./config/django/*initial_data.json ./fixtures
+
 # copy entrypoint.sh
 COPY ./entrypoint.sh ./entrypoint.sh
 RUN sed -i 's/\r$//g' /usr/src/app/entrypoint.sh

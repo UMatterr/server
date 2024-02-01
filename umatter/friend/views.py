@@ -91,7 +91,6 @@ def control_friend_info(request, pk):
             content={'Unknown error'},
         )
 
-
     if request.method == 'GET':
         try:
             data = FriendDetailSerializer(friend).data
