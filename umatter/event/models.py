@@ -5,14 +5,33 @@ from core.models import IDModel, TimestampModel
 from friend.models import Friend
 
 
-class EventType(IDModel):
+class EventType(models.Model):
+    id = models.AutoField(
+        primary_key=True,
+        editable=False
+    )
     name = models.CharField(
-        max_length=250,
-        validators=[MaxLengthValidator(250)],
+        max_length=100,
+        validators=[MaxLengthValidator(100)],
     )
 
     class Meta:
         db_table = 'event_type'
+
+
+class CustomEventType(models.Model):
+    id = models.AutoField(
+        primary_key=True,
+        editable=False
+    )
+    name = models.CharField(
+        max_length=100,
+        validators=[MaxLengthValidator(100)],
+        unique=True,
+    )
+
+    class Meta:
+        db_table = 'custom_event_type'
 
 
 class Event(IDModel, TimestampModel):
@@ -20,16 +39,26 @@ class Event(IDModel, TimestampModel):
         max_length=250,
         validators=[MaxLengthValidator(250)],
     )
-    friend = models.ManyToManyField(
+    friend = models.ForeignKey(
         Friend,
-    )
-    event_type = models.ManyToManyField(
-        EventType,
-    )
-    send_msg_at = models.DateTimeField(
+        on_delete=models.CASCADE,
         null=True,
     )
-    repeat_cycle = models.IntegerField()
+    event_type = models.ForeignKey(
+        EventType,
+        on_delete=models.DO_NOTHING,
+    )
+    custom_event_type = models.ForeignKey(
+        CustomEventType,
+        on_delete=models.DO_NOTHING,
+        null=True,
+    )
+    date = models.DateField(
+        null=True,
+    )
+    repeat = models.IntegerField(
+        null=True,
+    )
 
     class Meta:
         db_table = 'event'
