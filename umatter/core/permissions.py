@@ -73,8 +73,3 @@ class KakaoLoginPermission(permissions.BasePermission):
             return False
 
         return True
-                    
-    # def has_object_permission(self, request, view, obj):
-    #     if request.method == 'GET':
-    #         return True
-    #     return False

@@ -43,20 +43,24 @@ class Event(IDModel, TimestampModel):
     user = models.ForeignKey(
         User,
         on_delete=models.DO_NOTHING,
+        db_column='user',
     )
     friend = models.ForeignKey(
         Friend,
         on_delete=models.CASCADE,
         null=True,
+        db_column='friend',
     )
     event_type = models.ForeignKey(
         EventType,
         on_delete=models.DO_NOTHING,
+        db_column='event_type',
     )
     custom_event_type = models.ForeignKey(
         CustomEventType,
         on_delete=models.DO_NOTHING,
         null=True,
+        db_column='custom_event_type',
     )
     date = models.DateField(
         null=True,

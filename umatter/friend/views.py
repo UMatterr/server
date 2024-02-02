@@ -18,6 +18,7 @@ from .serializers import (
     FriendDetailSerializer,
     FriendSerializer,
 )
+from .services import count_events_for_friend
 
 
 logger = logging.getLogger(__name__)
@@ -29,8 +30,10 @@ def get_or_post_friend(request):
 
     user = request.user
     if request.method == 'GET':
-        friends = Friend.objects.filter(user_id=user.id)
-        data = FriendSerializer(friends, many=True).data
+        friends = Friend.objects.filter(user=user.id)
+        data = FriendSerializer(
+            friends, many=True, context={'user_id': user.id}
+        ).data
         logger.info(f"friends serialized: {data}")
         return JsonResponse(
             data,
@@ -52,12 +55,18 @@ def get_or_post_friend(request):
             )
 
         friend = Friend(
-            user_id=user.id,
+            user=user,
             name=name,
         )
         friend.save()
+        data = {
+            'friendId': friend.id,
+            'count': count_events_for_friend(
+                friend.id, user.id
+            )
+        }
         return JsonResponse(
-            {'friendId': friend.id},
+            data,
             status=201,
             safe=False
         )
@@ -120,20 +129,4 @@ def control_friend_info(request, pk):
 
         return HttpResponse(
             content={'Success'}, status=204
-        )
-
-    if request.method == 'POST':
-        try:
-            data = json.loads(request.body)
-            logger.info("data: %s", data)
-
-        except:
-            logger.error(tb.format_exc())
-            return HttpResponseBadRequest(
-                content={'Unknown error'}
-            )
-
-        return HttpResponse(
-            content={'Success'},
-            status=200
         )
