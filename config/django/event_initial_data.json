@@ -31,14 +31,14 @@
       "model": "event.EventType",
       "id": 5,
       "fields": {
-        "name": "제사"
+        "name": "입학"
       }
     },
     {
       "model": "event.EventType",
       "id": 6,
       "fields": {
-        "name": "장례"
+        "name": "졸업"
       }
     },
     {
