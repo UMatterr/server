@@ -1,30 +1,20 @@
 from django.urls import path
 
 from .views import (
-    get_or_post_event,
     delete_event,
+    get_event_by_friend,
 )
 
 
 urlpatterns = [
     path(
-        route='',
-        view=get_or_post_event,
-        name='event'
+        route='<uuid:pk>',
+        view=get_event_by_friend,
+        name='get_event_by_friend'
     ),
     path(
-        route='<str:uuid>',
+        route='rm/<uuid:pk>',
         view=delete_event,
         name='delete_event'
     ),
-    # path(
-    #     route='types',
-    #     view=EventTypeListView.as_view(),
-    #     name='event_type_list'
-    # ),
-    # path(
-    #     route='type/<str:uuid>',
-    #     view=EventTypeDetailView.as_view(),
-    #     name='event_type_detail'
-    # ),
 ]
