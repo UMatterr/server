@@ -8,7 +8,8 @@ from user.models import User
 class Friend(IDModel, PhoneModel, TimestampModel):
     user = models.ForeignKey(
         User,
-        on_delete=models.CASCADE
+        on_delete=models.CASCADE,
+        db_column='user',
     )
     name = models.CharField(
         max_length=250,

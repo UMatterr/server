@@ -11,10 +11,10 @@ from django.views.decorators.csrf import csrf_exempt
 from friend.models import Friend
 from user.utils import auth_user, control_request_method
 
-from .forms import EventForm
 from .models import CustomEventType, Event, EventType
 from .serializers import (
-    EventSerializer, EventTypeSerializer,
+    EventListSerializer, EventTypeSerializer,
+    FriendEventListSerializer,
 )
 
 
@@ -23,15 +23,29 @@ logger = logging.getLogger(__name__)
 @csrf_exempt
 @auth_user
 @control_request_method()
-def get_or_post_event(request):
+def get_events(request):
 
     user = request.user
     if request.method == 'GET':
         event = Event.objects.filter(user__id=user.id)
         logger.info(f"event: {event}")
-        data = EventSerializer(event, many=True).data
+        data = EventListSerializer(event, many=True).data
         logger.info(f"event serialized: {data}")
-        return HttpResponse(content=data, status=200)
+        return JsonResponse(data=data, status=200, safe=False)
+
+
+@csrf_exempt
+@auth_user
+@control_request_method()
+def get_event_by_friend(request, pk):
+
+    user = request.user
+    if request.method == 'GET':
+        event = Event.objects.filter(user__id=user.id, friend_id=pk)
+        logger.info(f"event: {event}")
+        data = FriendEventListSerializer(event, many=True).data
+        logger.info(f"event serialized: {data}")
+        return JsonResponse(data=data, status=200, safe=False)
 
 
 @csrf_exempt
@@ -109,6 +123,11 @@ def create_event(request):
         custom_event_type = None
         date = data['date']
         repeat = data['repeat']
+
+    except Friend.DoesNotExist:
+        return HttpResponseNotFound(
+            content={'No event type'},
+        )
 
     except EventType.DoesNotExist:
         return HttpResponseNotFound(

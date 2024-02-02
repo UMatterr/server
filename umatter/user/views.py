@@ -110,8 +110,7 @@ def kakao_callback(request):
             kakao_refresh_token=refresh_token,
         )
 
-    rsp = HttpResponseRedirect(CLIENT_BASE_URL)
-    # rsp = HttpResponseRedirect('/')
+    rsp = HttpResponseRedirect(CLIENT_BASE_URL + 'events')
     rsp = set_cookies_for_login(
         rsp,
         access_token,
@@ -137,7 +136,6 @@ def kakao_logout(request):
         logger.info(f"refresh token for logout: {refresh_token}")
         logout_and_remove_token(refresh_token=refresh_token)
         rsp = HttpResponseRedirect(CLIENT_BASE_URL)
-        # rsp = HttpResponseRedirect('/')
         rsp = delete_cookies(rsp)
 
         return rsp

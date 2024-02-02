@@ -1,20 +1,27 @@
 from rest_framework import serializers
 
-from user.serializers import UserSerializer
+from event.models import Event
 
 from .models import Friend
 
 
 class FriendSerializer(serializers.ModelSerializer):
 
-    friendId = serializers.SerializerMethodField('get_alternative_name')
+    friendId = serializers.SerializerMethodField('get_alternative_id')
+    count = serializers.SerializerMethodField('get_event_count')
 
     class Meta:
         model = Friend
-        fields = ['friendId', 'name']
+        fields = ['friendId', 'name', 'count']
 
-    def get_alternative_name(self, obj):
+    def get_alternative_id(self, obj):
         return obj.id
+
+    def get_event_count(self, obj):
+        return Event.objects.filter(
+            user__id=self.context.get("user_id"),
+            friend__id=obj.id,
+        ).count()
 
 
 class FriendDetailSerializer(serializers.ModelSerializer):
