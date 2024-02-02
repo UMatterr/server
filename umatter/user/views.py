@@ -110,7 +110,7 @@ def kakao_callback(request):
             kakao_refresh_token=refresh_token,
         )
 
-    rsp = HttpResponseRedirect(CLIENT_BASE_URL + 'events')
+    rsp = HttpResponseRedirect(CLIENT_BASE_URL)
     rsp = set_cookies_for_login(
         rsp,
         access_token,
