@@ -1,6 +1,6 @@
 #!/bin/sh
 
-if [ "$POSTGRES_DB" = "umatter" ];
+if [ "$POSTGRES_DB" = "umatter" ]
 then
     echo "Waiting for postgres..."
 
@@ -15,6 +15,5 @@ python manage.py flush --no-input
 python manage.py makemigrations
 python manage.py migrate
 python manage.py loaddata event_initial_data.json
-# python manage.py runserver localhost:8000
 
 exec "$@"
