@@ -9,7 +9,7 @@ services:
       - 5432:5432
   web:
     build: .
-    command: python manage.py runserver web:8000
+    command: gunicorn --bind web:8000 --workers 4 --threads 4 --timeout 60 --log-level=info --log-file=- umatter.wsgi:application
     ports:
       - 8000:8000
     env_file:
