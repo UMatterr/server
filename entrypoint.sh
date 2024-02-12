@@ -16,5 +16,6 @@ python manage.py makemigrations
 python manage.py migrate
 python manage.py loaddata event_initial_data.json
 # python manage.py runserver localhost:8000
+# gunicorn --bind 0.0.0.0:8000 --workers 4 --threads 4 --timeout 60 --log-level=info --log-file=- umatter.wsgi:application
 
 exec "$@"
