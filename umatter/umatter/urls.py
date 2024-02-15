@@ -20,11 +20,13 @@ from django.urls import include, path
 from core.views import health_check
 from event.views import get_events, create_event, get_event_type
 from friend.views import get_or_post_friend
+from user.views import get_auth
 
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('healthz', health_check, name='health_check'),
+    path('auth', get_auth, name='get_auth'),
     path('auth/', include('user.urls')),
     path('friends', get_or_post_friend, name='friends'),
     path('friends/', include('friend.urls')),

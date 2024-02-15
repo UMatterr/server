@@ -1,6 +1,7 @@
 import logging
 
 from django.http import (
+    HttpResponse,
     HttpResponseRedirect,
     JsonResponse,
 )
@@ -152,4 +153,22 @@ def refresh_kakao_access_token(request):
         rsp=rsp,
         access_token=access_token,
     )
+    return rsp
+
+
+@control_request_method()
+def get_auth(request):
+
+    is_logged_in = request.COOKIES.get("isLoggedIn")
+    if is_logged_in is None:
+        logger.error('No login cookie')
+        rsp = HttpResponse(content={'fail'}, status=401)
+        return rsp
+
+    if not is_logged_in:
+        logger.error('Not logged in')
+        rsp = HttpResponse(content={'fail'}, status=401)
+        return rsp
+
+    rsp = HttpResponse(content={'success'}, status=200)
     return rsp
