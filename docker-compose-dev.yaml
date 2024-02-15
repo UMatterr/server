@@ -8,8 +8,9 @@ services:
     ports:
       - 5432:5432
   web:
-    build: .
-    command: gunicorn --bind web:8000 --workers 4 --threads 4 --timeout 60 --log-level=info --log-file=- umatter.wsgi:application
+    build:
+      context: .
+      dockerfile: Dockerfile-dev
     ports:
       - 8000:8000
     env_file:

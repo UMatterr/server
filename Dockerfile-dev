@@ -21,7 +21,7 @@ RUN mkdir fixtures
 COPY ./config/django/*initial_data.json ./fixtures
 
 # copy entrypoint.sh
-COPY ./entrypoint.sh ./entrypoint.sh
+COPY ./entrypoint-dev.sh ./entrypoint.sh
 RUN sed -i 's/\r$//g' /usr/src/app/entrypoint.sh
 RUN chmod +x /usr/src/app/entrypoint.sh
 

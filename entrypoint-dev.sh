@@ -14,6 +14,6 @@ fi
 python manage.py flush --no-input
 python manage.py makemigrations
 python manage.py migrate
+python manage.py collectstatic
 python manage.py loaddata event_initial_data.json
-
-exec "$@"
+gunicorn -b web:8000 -w 4 --threads 4 --timeout 60 --log-level 'info' umatter.wsgi:application
