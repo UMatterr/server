@@ -4,7 +4,7 @@ services:
     # volumes:
     #   - ./db:/var/lib/postgresql/data
     env_file:
-      - ./config/postgres/.env
+      - ./config/postgres/.env-dev
     ports:
       - 5432:5432
   web:

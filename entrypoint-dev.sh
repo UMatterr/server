@@ -1,7 +1,6 @@
 #!/bin/sh
 
-if [ "$POSTGRES_DB" = "umatter" ]
-then
+if [ "$POSTGRES_DB" = "umatter" ]; then
     echo "Waiting for postgres..."
 
     while ! nc -z $POSTGRES_HOST $POSTGRES_PORT; do
