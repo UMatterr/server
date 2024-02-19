@@ -1,0 +1,35 @@
+[
+    {
+      "model": "nlp.NLPConfig",
+      "id": 1,
+      "fields": {
+        "key": "pre_generate_num",
+        "value": "200"
+      }
+    },
+    {
+      "model": "nlp.NLPConfig",
+      "id": 2,
+      "fields": {
+        "key": "min_retrain_num",
+        "value": "200"
+      }
+    },
+    {
+      "model": "nlp.NLPConfig",
+      "id": 3,
+      "fields": {
+        "key": "min_retrain_start_hour",
+        "value": "0"
+      }
+    },
+    {
+      "model": "nlp.NLPConfig",
+      "id": 4,
+      "fields": {
+        "key": "max_retrain_end_hour",
+        "value": "5"
+      }
+    }
+  ]
+  

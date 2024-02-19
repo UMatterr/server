@@ -63,10 +63,14 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'django.contrib.sites',
 
+    # app
     'event',
     'friend',
-    'message',
+    # 'message',
     'user',
+
+    # nlp
+    'nlp',
 
     'rest_framework',
     'rest_framework.authtoken',
@@ -124,8 +128,9 @@ WSGI_APPLICATION = 'umatter.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 DATABASES = {
+    'default': {},
     # primary db
-    'default': {
+    'app_db': {
         "ENGINE": "django.db.backends.postgresql",
         "NAME": get_env("POSTGRES_DB", ""),
         "USER": get_env("POSTGRES_USER", ""),
@@ -154,10 +159,10 @@ DATABASES = {
         # "OPTIONS": {},
     },
 }
-# DATABASE_ROUTERS = [
-#     'core.db_routers.NLPRouter',
-#     # 'core.db_routers.PrimaryReplicaRouter',
-# ]
+DATABASE_ROUTERS = [
+    'core.db_routers.AppRouter',
+    # 'core.db_routers.PrimaryReplicaRouter',
+]
 
 
 # Password validation

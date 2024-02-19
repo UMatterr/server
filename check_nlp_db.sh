@@ -1,0 +1,1 @@
+docker exec -it server-nlp_db-1 psql -U umatter_admin -d umatter_test_db -W
