@@ -1,4 +1,5 @@
 # ref: https://gist.github.com/josuedjh3/38c521c9091b5c268f2a4d5f3166c497
+import logging
 import os
 import re
 from pathlib import Path
@@ -22,8 +23,8 @@ def load_env(path: Path):
     quote_match = re.compile(r'''[^"]*"(.+)"''').match
     match_setting = re.compile(r'^(?P<name>[A-Z][A-Z_0-9]+)\s?=\s?(?P<value>.*)').match
     aliases = {
-        'true': True, 'on': True, 'True': True,
-        'false': False, 'off': False, 'False': False, 
+        'true': True, 'on': True,
+        'false': False, 'off': False
     }
 
     if not path.exists():

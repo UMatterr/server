@@ -2,6 +2,7 @@ import logging
 import traceback as tb
 from functools import wraps
 
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import (
     HttpResponse, HttpResponseBadRequest,
     HttpResponseNotAllowed, HttpResponseNotFound,
@@ -69,13 +70,13 @@ def auth_user(f):
             return HttpResponseNotFound(
                 'No user info'
             )
-            
+
         except User.MultipleObjectsReturned:
             logger.error(tb.format_exc())
             return HttpResponseBadRequest(
                 'Multiple user info have returned'
             )
-            
+
         except:
             logger.error(tb.format_exc())
             return HttpResponseBadRequest(

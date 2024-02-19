@@ -5,7 +5,12 @@ from urllib.parse import urlencode
 import requests
 
 from core.utils import get_env
-from umatter.settings import BASE_URL
+from umatter.settings import (
+    BASE_URL,
+    SESSION_COOKIE_DOMAIN,
+    SESSION_COOKIE_SAMESITE,
+    SESSION_COOKIE_SECURE,
+)
 from .models import User, LoginLog
 
 
@@ -196,18 +201,28 @@ def set_cookies_for_login(
             key="accessToken",
             value=access_token,
             httponly=True,
+            domain=SESSION_COOKIE_DOMAIN,
+            samesite=SESSION_COOKIE_SAMESITE,
+            secure=SESSION_COOKIE_SECURE,
         )
     if refresh_token:
         rsp.set_cookie(
             key="refreshToken",
             value=refresh_token,
             httponly=True,
+            domain=SESSION_COOKIE_DOMAIN,
+            samesite=SESSION_COOKIE_SAMESITE,
+            secure=SESSION_COOKIE_SECURE,
         )
     rsp.set_cookie(
         key="isLoggedIn",
         value=True,
         httponly=False,
+        domain=SESSION_COOKIE_DOMAIN,
+        samesite=SESSION_COOKIE_SAMESITE,
+        secure=SESSION_COOKIE_SECURE,
     )
+    logger.info(rsp.__dict__)
     return rsp
 
 

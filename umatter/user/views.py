@@ -110,13 +110,12 @@ def kakao_callback(request):
             kakao_refresh_token=refresh_token,
         )
 
-    rsp = HttpResponseRedirect(CLIENT_BASE_URL + 'events')
+    rsp = HttpResponseRedirect(CLIENT_BASE_URL)
     rsp = set_cookies_for_login(
         rsp,
         access_token,
         refresh_token,
     )
-    # logger.info(f"rsp: {rsp.__dict__}")
 
     return rsp
 
@@ -149,7 +148,6 @@ def refresh_kakao_access_token(request):
     refresh_token = request.COOKIES.get("refreshToken")
     access_token = get_access_token_by_refresh_token(refresh_token)
     rsp = HttpResponseRedirect(CLIENT_BASE_URL)
-    # rsp = HttpResponseRedirect('/')
     rsp = set_cookies_for_login(
         rsp=rsp,
         access_token=access_token,

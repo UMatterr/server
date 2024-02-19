@@ -29,4 +29,4 @@ python manage.py createsuperuser --noinput \
 python manage.py collectstatic
 python manage.py loaddata --database=app_db event_initial_data.json
 python manage.py loaddata --database=nlp_db nlp_initial_data.json
-gunicorn -b 0.0.0.0:8000 -w 4 --threads 4 --timeout 60 --log-level 'info' --forwarded-allow-ips '*' --proxy-allow-from '*' umatter.wsgi:application
+gunicorn -b web:8000 -w 4 --threads 4 --timeout 60 --log-level 'info' umatter.wsgi:application

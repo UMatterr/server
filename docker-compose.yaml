@@ -4,15 +4,24 @@ services:
     # volumes:
     #   - ./db:/var/lib/postgresql/data
     env_file:
-      - ./config/postgres/.env
+      - ./config/postgres/.env-dev
     ports:
       - 5432:5432
+  nlp_db:
+    image: postgres:15
+    # volumes:
+    #   - ./db:/var/lib/postgresql/data
+    env_file:
+      - ./config/postgres/.env-nlp
+    ports:
+      - 5433:5432
   web:
     build: .
-    command: python manage.py runserver 0.0.0.0:8000
+    command: gunicorn -b web:8000 -w 4 --threads 4 --timeout 60 --log-level=info umatter.wsgi:application
     ports:
       - 8000:8000
     env_file:
       - ./config/django/.env
     depends_on:
       - db
+      - nlp_db

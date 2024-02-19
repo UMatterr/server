@@ -21,9 +21,6 @@ from corsheaders.defaults import (
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-# here you indicate where your .env file is
-load_env(BASE_DIR / "../config/django/.env-local")
-
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 # SECURITY WARNING: keep the secret key used in production secret!
@@ -44,6 +41,10 @@ CSRF_COOKIE_HTTPONLY = get_env("DJANGO_CSRF_COOKIE_HTTPONLY", 'true') == 'true'
 CSRF_TRUSTED_ORIGINS = get_env("DJANGO_CSRF_TRUSTED_ORIGINS", "").split()
 CSRF_USE_SESSIONS = get_env("DJANGO_CSRF_USE_SESSIONS", 'true') == 'true'
 SESSION_COOKIE_HTTPONLY = get_env("DJANGO_SESSION_COOKIE_HTTPONLY", 'true') == 'true'
+SESSION_COOKIE_DOMAIN = get_env("DJANGO_SESSION_COOKIE_DOMAIN", None)
+SESSION_COOKIE_SAMESITE = get_env("DJANGO_SESSION_COOKIE_SAMESITE", "None")
+SESSION_COOKIE_SECURE = get_env("DJANGO_SESSION_COOKIE_SECURE", 'true') == 'true'
+SECURE_CROSS_ORIGIN_OPENER_POLICY = get_env("DJANGO_SECURE_CROSS_ORIGIN_OPENER_POLICY", "unsafe-none")
 
 BASE_URL = get_env("DJANGO_BASE_URL", "")
 CLIENT_BASE_URL = get_env("DJANGO_CLIENT_BASE_URL", "")
@@ -62,10 +63,14 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'django.contrib.sites',
 
+    # app
     'event',
     'friend',
-    'message',
+    # 'message',
     'user',
+
+    # nlp
+    'nlp',
 
     'rest_framework',
     'rest_framework.authtoken',
@@ -122,9 +127,10 @@ WSGI_APPLICATION = 'umatter.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
-
 DATABASES = {
-    'default': {
+    'default': {},
+    # primary db
+    'app_db': {
         "ENGINE": "django.db.backends.postgresql",
         "NAME": get_env("POSTGRES_DB", ""),
         "USER": get_env("POSTGRES_USER", ""),
@@ -132,8 +138,31 @@ DATABASES = {
         "HOST": get_env("POSTGRES_HOST", ""),
         "PORT": get_env("POSTGRES_PORT", ""),
         # "OPTIONS": {},
-    }
+    },
+    # # replica of the primary db
+    # 'replica': {
+    #     "ENGINE": "django.db.backends.postgresql",
+    #     "NAME": get_env("SUB_POSTGRES_DB", ""),
+    #     "USER": get_env("SUB_POSTGRES_USER", ""),
+    #     "PASSWORD": get_env("SUB_POSTGRES_PASSWORD", ""),
+    #     "HOST": get_env("SUB_POSTGRES_HOST", ""),
+    #     "PORT": get_env("SUB_POSTGRES_PORT", ""),
+    #     # "OPTIONS": {},
+    # },
+    'nlp_db': {
+        "ENGINE": "django.db.backends.postgresql",
+        "NAME": get_env("NLP_POSTGRES_DB", ""),
+        "USER": get_env("NLP_POSTGRES_USER", ""),
+        "PASSWORD": get_env("NLP_POSTGRES_PASSWORD", ""),
+        "HOST": get_env("NLP_POSTGRES_HOST", ""),
+        "PORT": get_env("NLP_POSTGRES_PORT", ""),
+        # "OPTIONS": {},
+    },
 }
+DATABASE_ROUTERS = [
+    'core.db_routers.AppRouter',
+    # 'core.db_routers.PrimaryReplicaRouter',
+]
 
 
 # Password validation
@@ -239,6 +268,14 @@ LOGGING = {
             "level": "INFO",
         },
         "user": {
+            "handlers": ["verbose"],
+            "level": "INFO",
+        },
+        "event": {
+            "handlers": ["verbose"],
+            "level": "INFO",
+        },
+        "friend": {
             "handlers": ["verbose"],
             "level": "INFO",
         },

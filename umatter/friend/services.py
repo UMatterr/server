@@ -10,7 +10,7 @@ def count_events_for_friend(friend_pk, user_pk):
     try:
         return Event.objects.filter(
             friend__id=friend_pk,
-            user__id=user_pk
+            user__id=user_pk,
         ).count()
 
     except Exception as e:

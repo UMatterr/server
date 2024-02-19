@@ -61,7 +61,7 @@ def get_or_post_friend(request):
         friend.save()
         data = {
             'friendId': friend.id,
-            'event': count_events_for_friend(
+            'count': count_events_for_friend(
                 friend.id, user.id
             )
         }
