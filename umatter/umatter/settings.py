@@ -123,8 +123,8 @@ WSGI_APPLICATION = 'umatter.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
-
 DATABASES = {
+    # primary db
     'default': {
         "ENGINE": "django.db.backends.postgresql",
         "NAME": get_env("POSTGRES_DB", ""),
@@ -133,8 +133,31 @@ DATABASES = {
         "HOST": get_env("POSTGRES_HOST", ""),
         "PORT": get_env("POSTGRES_PORT", ""),
         # "OPTIONS": {},
-    }
+    },
+    # # replica of the primary db
+    # 'replica': {
+    #     "ENGINE": "django.db.backends.postgresql",
+    #     "NAME": get_env("SUB_POSTGRES_DB", ""),
+    #     "USER": get_env("SUB_POSTGRES_USER", ""),
+    #     "PASSWORD": get_env("SUB_POSTGRES_PASSWORD", ""),
+    #     "HOST": get_env("SUB_POSTGRES_HOST", ""),
+    #     "PORT": get_env("SUB_POSTGRES_PORT", ""),
+    #     # "OPTIONS": {},
+    # },
+    'nlp_db': {
+        "ENGINE": "django.db.backends.postgresql",
+        "NAME": get_env("NLP_POSTGRES_DB", ""),
+        "USER": get_env("NLP_POSTGRES_USER", ""),
+        "PASSWORD": get_env("NLP_POSTGRES_PASSWORD", ""),
+        "HOST": get_env("NLP_POSTGRES_HOST", ""),
+        "PORT": get_env("NLP_POSTGRES_PORT", ""),
+        # "OPTIONS": {},
+    },
 }
+# DATABASE_ROUTERS = [
+#     'core.db_routers.NLPRouter',
+#     # 'core.db_routers.PrimaryReplicaRouter',
+# ]
 
 
 # Password validation

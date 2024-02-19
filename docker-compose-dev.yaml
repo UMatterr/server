@@ -7,6 +7,14 @@ services:
       - ./config/postgres/.env-dev
     ports:
       - 5432:5432
+  nlp_db:
+    image: postgres:15
+    # volumes:
+    #   - ./db:/var/lib/postgresql/data
+    env_file:
+      - ./config/postgres/.env-nlp-dev
+    ports:
+      - 5433:5432
   web:
     build:
       context: .
@@ -17,3 +25,4 @@ services:
       - ./config/django/.env-dev
     depends_on:
       - db
+      - nlp_db
