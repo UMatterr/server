@@ -67,16 +67,10 @@ INSTALLED_APPS = [
     'django.contrib.sites',
 
     # app
-    # 'event',
-    # 'friend',
-    # # 'message',
-    # 'user',
-    'event.apps.EventConfig',
-    'friend.apps.FriendConfig',
-    'user.apps.UserConfig',
-
-    # nlp
-    'nlp.apps.NlpConfig',
+    'event',
+    'friend',
+    # 'message',
+    'user',
 
     'rest_framework',
     'rest_framework.authtoken',
@@ -134,9 +128,8 @@ WSGI_APPLICATION = 'umatter.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 DATABASES = {
-    'default': {},
     # primary db
-    'app_db': {
+    'default': {
         "ENGINE": "django.db.backends.postgresql",
         "NAME": get_env("POSTGRES_DB", ""),
         "USER": get_env("POSTGRES_USER", ""),
@@ -155,21 +148,21 @@ DATABASES = {
     #     "PORT": get_env("SUB_POSTGRES_PORT", ""),
     #     # "OPTIONS": {},
     # },
-    'nlp_db': {
-        "ENGINE": "django.db.backends.postgresql",
-        "NAME": get_env("NLP_POSTGRES_DB", ""),
-        "USER": get_env("NLP_POSTGRES_USER", ""),
-        "PASSWORD": get_env("NLP_POSTGRES_PASSWORD", ""),
-        "HOST": get_env("NLP_POSTGRES_HOST", ""),
-        "PORT": get_env("NLP_POSTGRES_PORT", ""),
-        # "OPTIONS": {},
-    },
+    # 'nlp_db': {
+    #     "ENGINE": "django.db.backends.postgresql",
+    #     "NAME": get_env("NLP_POSTGRES_DB", ""),
+    #     "USER": get_env("NLP_POSTGRES_USER", ""),
+    #     "PASSWORD": get_env("NLP_POSTGRES_PASSWORD", ""),
+    #     "HOST": get_env("NLP_POSTGRES_HOST", ""),
+    #     "PORT": get_env("NLP_POSTGRES_PORT", ""),
+    #     # "OPTIONS": {},
+    # },
 }
-DATABASE_ROUTERS = [
-    'core.db_routers.AppRouter',
-    'core.db_routers.NLPRouter',
-    # 'core.db_routers.PrimaryReplicaRouter',
-]
+# DATABASE_ROUTERS = [
+#     'core.db_routers.AppRouter',
+#     'core.db_routers.NLPRouter',
+#     # 'core.db_routers.PrimaryReplicaRouter',
+# ]
 
 
 # Password validation
