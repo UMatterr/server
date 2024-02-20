@@ -3,37 +3,64 @@ import random
 
 class AppRouter:
     route_app_labels = {
-        "admin": "app_db",
-        "auth": "app_db",
-        "sessions": "app_db",
-        "contenttypes": "app_db",
-        "event": "app_db",
-        "friend": "app_db",
-        "user": "app_db",
-        "nlp": "nlp_db",
+        "admin",
+        "auth",
+        "sessions",
+        "contenttypes",
     }
+    db_name = "app_db"
 
     def db_for_read(self, model, **hints):
-        if model._meta.app_label in self.route_app_labels.keys():
-            return self.route_app_labels[model._meta.app_label]
+        if model._meta.app_label in self.route_app_labels:
+            return self.db_name
         return None
 
     def db_for_write(self, model, **hints):
-        if model._meta.app_label in self.route_app_labels.keys():
-            return self.route_app_labels[model._meta.app_label]
+        if model._meta.app_label in self.route_app_labels:
+            return self.db_name
         return None
 
     def allow_relation(self, obj1, obj2, **hints):
         if (
-            obj1._meta.app_label in self.route_app_labels.keys()
-            or obj2._meta.app_label in self.route_app_labels.keys()
-        ) and (obj1._meta.app_label == obj2._meta.app_label):
+            obj1._meta.app_label in self.route_app_labels
+            or obj2._meta.app_label in self.route_app_labels
+        ):
             return True
         return None
 
     def allow_migrate(self, db, app_label, model_name=None, **hints):
         if app_label in self.route_app_labels:
-            return db == self.route_app_labels[app_label]
+            return db == self.db_name
+        return None
+
+
+class NLPRouter:
+    route_app_labels = {
+        "nlp",
+    }
+    db_name = "nlp_db"
+
+    def db_for_read(self, model, **hints):
+        if model._meta.app_label in self.route_app_labels:
+            return self.db_name
+        return None
+
+    def db_for_write(self, model, **hints):
+        if model._meta.app_label in self.route_app_labels:
+            return self.db_name
+        return None
+
+    def allow_relation(self, obj1, obj2, **hints):
+        if (
+            obj1._meta.app_label in self.route_app_labels
+            or obj2._meta.app_label in self.route_app_labels
+        ):
+            return True
+        return None
+
+    def allow_migrate(self, db, app_label, model_name=None, **hints):
+        if app_label in self.route_app_labels:
+            return db == self.db_name
         return None
 
 

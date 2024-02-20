@@ -19,12 +19,23 @@ fi
 
 if ls ./{event,friend,user,nlp}/migrations/[0-9]*.py 1> /dev/null 2>&1; then
    echo Cleaning the existing migrations
-   rm ./{event,friend,user,nlp}/migrations/[0-9]*.py
+   rm -v ./{event,friend,user,nlp}/migrations/[0-9]*.py
 fi 
 
 echo executing the user migrations
-./manage.py makemigrations
+echo 1
+./manage.py makemigrations user
+echo 2
 ./manage.py migrate --database=app_db
+echo 3
+./manage.py makemigrations event friend
+echo 4
+./manage.py migrate --database=app_db
+echo 5
+./manage.py makemigrations nlp
+echo 6
 ./manage.py migrate --database=nlp_db
+echo 7
 ./manage.py loaddata --database=app_db event_initial_data.json
+echo 8
 ./manage.py loaddata --database=nlp_db nlp_initial_data.json

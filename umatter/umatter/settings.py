@@ -21,6 +21,9 @@ from corsheaders.defaults import (
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+# here you indicate where your .env file is
+load_env(BASE_DIR / "../config/django/.env-local")
+
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 # SECURITY WARNING: keep the secret key used in production secret!
@@ -64,13 +67,16 @@ INSTALLED_APPS = [
     'django.contrib.sites',
 
     # app
-    'event',
-    'friend',
-    # 'message',
-    'user',
+    # 'event',
+    # 'friend',
+    # # 'message',
+    # 'user',
+    'event.apps.EventConfig',
+    'friend.apps.FriendConfig',
+    'user.apps.UserConfig',
 
     # nlp
-    'nlp',
+    'nlp.apps.NlpConfig',
 
     'rest_framework',
     'rest_framework.authtoken',
@@ -161,6 +167,7 @@ DATABASES = {
 }
 DATABASE_ROUTERS = [
     'core.db_routers.AppRouter',
+    'core.db_routers.NLPRouter',
     # 'core.db_routers.PrimaryReplicaRouter',
 ]
 
