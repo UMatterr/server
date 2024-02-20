@@ -17,14 +17,12 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import include, path
 
-from core.views import health_check
 from event.views import get_events, create_event, get_event_type
 from friend.views import get_or_post_friend
 
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('healthz', health_check, name='health_check'),
     path('auth/', include('user.urls')),
     path('friends', get_or_post_friend, name='friends'),
     path('friends/', include('friend.urls')),
