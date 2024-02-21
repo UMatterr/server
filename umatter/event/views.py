@@ -27,10 +27,35 @@ def get_events(request):
 
     user = request.user
     if request.method == 'GET':
-        event = Event.objects.filter(user__id=user.id)
-        logger.info(f"event: {event}")
+        friend_name = request.GET.get("name", "")
+        event_type = request.GET.get("etype", "")
+
+        event = Event.objects.filter(
+            user__id=user.id
+        )
+        logger.info("before filtering: %s", event)
+
+        if friend_name != "" and event_type != "":
+            event = event.filter(
+                event_type__id=event_type,
+                friend__name=friend_name
+            )
+
+        elif friend_name != "":
+            event = event.filter(
+                friend__name=friend_name
+            )
+
+        elif event_type != "":
+            event = event.filter(
+                event_type__id=event_type,
+            )
+
+        logger.info("before filtering: %s", event)
+
         data = EventListSerializer(event, many=True).data
-        logger.info(f"event serialized: {data}")
+        logger.info("event serialized: %s", data)
+
         return JsonResponse(data=data, status=200, safe=False)
 
 
@@ -51,9 +76,9 @@ def get_event_by_friend(request, pk):
 @csrf_exempt
 @auth_user
 @control_request_method(method=('DELETE'))
-def delete_event(request, uuid):
+def delete_event(request, pk):
     try:
-        event = Event.objects.get(id=uuid)
+        event = Event.objects.get(id=pk)
         logger.info(f"event: {event}")
         event.delete()
 

@@ -10,13 +10,11 @@ if [ "$POSTGRES_DB" = "umatter" ]; then
     echo "PostgreSQL started"
 fi
 
-python manage.py flush --no-input
+python manage.py flush --noinput
 python manage.py makemigrations
 python manage.py migrate
-python manage.py createsuperuser --noinput \
-	--email $DJANGO_SUPERUSER_EMAIL
 python manage.py collectstatic
-python manage.py loaddata event_initial_data.json
+python manage.py loaddata test_initial_data.json
 gunicorn -w 4 \
   -b web:8000 \
   --threads 4 \
