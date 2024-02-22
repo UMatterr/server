@@ -20,19 +20,19 @@ class EventType(models.Model):
         db_table = 'event_type'
 
 
-class CustomEventType(models.Model):
-    id = models.AutoField(
-        primary_key=True,
-        editable=False
-    )
-    name = models.CharField(
-        max_length=100,
-        validators=[MaxLengthValidator(100)],
-        unique=True,
-    )
+# class CustomEventType(models.Model):
+#     id = models.AutoField(
+#         primary_key=True,
+#         editable=False
+#     )
+#     name = models.CharField(
+#         max_length=100,
+#         validators=[MaxLengthValidator(100)],
+#         unique=True,
+#     )
 
-    class Meta:
-        db_table = 'custom_event_type'
+#     class Meta:
+#         db_table = 'custom_event_type'
 
 
 class Event(IDModel, TimestampModel):
@@ -56,12 +56,12 @@ class Event(IDModel, TimestampModel):
         on_delete=models.DO_NOTHING,
         db_column='event_type',
     )
-    custom_event_type = models.ForeignKey(
-        CustomEventType,
-        on_delete=models.DO_NOTHING,
-        null=True,
-        db_column='custom_event_type',
-    )
+    # custom_event_type = models.ForeignKey(
+    #     CustomEventType,
+    #     on_delete=models.DO_NOTHING,
+    #     null=True,
+    #     db_column='custom_event_type',
+    # )
     date = models.DateField(
         null=True,
     )

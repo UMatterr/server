@@ -66,7 +66,7 @@ INSTALLED_APPS = [
     # app
     'event',
     'friend',
-    # 'message',
+    'message',
     'user',
 
     'rest_framework',
