@@ -1,55 +1,66 @@
+import json
 import logging
-import traceback as tb
 
+from django.conf import settings
 from django.http import (
     HttpResponseBadRequest, HttpResponseServerError,
     JsonResponse,
 )
 from django.views.decorators.csrf import csrf_exempt
 
-from core.utils import get_env
-from user.utils import auth_user, control_request_method
-from .models import Phrase
-
 import requests as req
-import json
+
+from user.utils import auth_user, control_request_method
+from event.utils import is_valid_event_type
+
+from .models import Phrase
 
 
 logger = logging.getLogger(__name__)
-NLP_API_URL = get_env('NLP_API_URL', "")
 
 @csrf_exempt
 @auth_user
 @control_request_method()
-def get_phrase(request, event_id):
+def get_phrase(request, event_type_id):
 
     use_cache = request.GET.get('useCache', 1)
 
-    url = f"{NLP_API_URL}/phrase/{event_id}"
+    url = f"{settings.NLP_API_HOST}/phrase/{event_type_id}"
     params = {
         "use_cache": use_cache,
         "how": "asis"
     }
-    data = req.get(
-        url,
-        params=params,
-        timeout=60
-    )
-    data = data.json()
 
-    logger.info("data: %s", data)
+    if not is_valid_event_type(event_type_id):
+        logger.error("Invalid event type id")
+        return HttpResponseBadRequest('Invalid event type id')
 
-    return JsonResponse(
-        data=data,
-        status=200,
-        safe=False,
-    )
+    try:
+        rsp = req.get(
+            url,
+            params=params,
+            timeout=60
+        )
+        logger.info("data: %s", rsp.__dict__)
+
+        data = rsp.json()
+        logger.info("data: %s", data)
+
+        return JsonResponse(
+            data=data,
+            status=200,
+            safe=False,
+        )
+
+    except Exception as e:
+        logger.error("Error: %s", e, exc_info=True)
+        return HttpResponseServerError('Error')
 
 
 @csrf_exempt
 @auth_user
 @control_request_method(method=('POST'))
-def post_phrase_converting(request):
+def post_converted_phrase(request):
 
     phrase = []
     how = "asis"
@@ -60,7 +71,7 @@ def post_phrase_converting(request):
         how = body.get('how')
 
     except Exception as e:
-        logger.error("Invalid body: %s, %s", e, body)
+        logger.error("Invalid body: %s, %s", e, body, exc_info=True)
         return HttpResponseBadRequest('Invalid body')
 
     if not phrase:
@@ -71,25 +82,31 @@ def post_phrase_converting(request):
         logger.error("Invalid how: %s", how)
         return HttpResponseBadRequest('Invalid how')
 
-    url = f"{NLP_API_URL}/converted/{how}"
+    url = f"{settings.NLP_API_HOST}/converted/{how}"
     payload = {
         "content": phrase,
     }
-    data = req.post(
-        url,
-        data=payload,
-        timeout=60
-    )
-    logger.info("data: %s", data.__dict__)
+    try:
+        rsp = req.post(
+            url,
+            json=payload,
+            timeout=60
+        )
+        logger.info("rsp: %s", rsp.__dict__)
 
-    if data.status_code >= 500:
-        logger.error("NLP server error")
-        return HttpResponseServerError('NLP server error')
+        if rsp.status_code != 200:
+            logger.error("NLP server error")
+            return HttpResponseServerError('NLP server error')
 
-    data = data.json()
+        data = rsp.json()
+        logger.info("data: %s", data)
 
-    return JsonResponse(
-        data={"phrase": data["converted"]},
-        status=200,
-        safe=False,
-    )
+        return JsonResponse(
+            data={"phrase": data["converted"]},
+            status=200,
+            safe=False,
+        )
+
+    except Exception as e:
+        logger.error("Error: %s", e, exc_info=True)
+        return HttpResponseServerError('Error')

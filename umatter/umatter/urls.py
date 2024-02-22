@@ -19,7 +19,7 @@ from django.urls import include, path
 
 from event.views import get_events, create_event, delete_event, get_event_type
 from friend.views import get_or_post_friend
-from message.views import *
+from message.views import post_converted_phrase
 
 
 urlpatterns = [
@@ -38,6 +38,6 @@ urlpatterns = [
     path('friends/', include('friend.urls')),
 
     # message
-    path('converted/',get_events, name='get_events'),
+    path('converted/',post_converted_phrase, name='post_converted_phrase'),
     path('phrase/', include('message.urls')),
 ]

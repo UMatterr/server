@@ -11,7 +11,7 @@ from django.views.decorators.csrf import csrf_exempt
 from friend.models import Friend
 from user.utils import auth_user, control_request_method
 
-from .models import CustomEventType, Event, EventType
+from .models import Event, EventType
 from .serializers import (
     EventListSerializer, EventTypeSerializer,
     FriendEventListSerializer,
@@ -138,14 +138,14 @@ def create_event(request):
         )
 
     try:
-        name = data['name']
+        # name = data['name']
         friend = Friend.objects.get(
             id=data['friendId']
         )
         event_type = EventType.objects.get(
             id=int(data['eventTypeId'])
         )
-        custom_event_type = None
+        name = event_type.name
         date = data['date']
         repeat = data['repeat']
 
@@ -166,39 +166,12 @@ def create_event(request):
             status=400
         )
 
-    if event_type.name == '기타':
-        logger.info("name: %s, %s", name, event_type.name)
-        if name is None:
-            return HttpResponseBadRequest(
-                content={'No event name'},
-            )
-
-        try:
-            custom_event_type = CustomEventType.objects.get(name=name)
-            logger.info(
-                "Retrieved an existing custom event type: %s",
-                custom_event_type
-            )
-
-        except CustomEventType.DoesNotExist:
-            custom_event_type = CustomEventType(name=name)
-            custom_event_type.save()
-            logger.info(
-                "Created a new custom event type: %s",
-                custom_event_type
-            )
-        name = custom_event_type.name
-
-    else:
-        name = event_type.name
-
     try:
         event = Event(
             name=name,
             user=user,
             friend=friend,
             event_type=event_type,
-            custom_event_type=custom_event_type,
             date=date,
             repeat=repeat,
         )

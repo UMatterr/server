@@ -7,7 +7,7 @@ from .views import (
 
 urlpatterns = [
     path(
-        route='<str:event_id>',
+        route='<int:event_type_id>',
         view=get_phrase,
         name='get_phrase',
     ),

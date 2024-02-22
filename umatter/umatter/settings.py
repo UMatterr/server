@@ -48,6 +48,7 @@ SECURE_CROSS_ORIGIN_OPENER_POLICY = get_env("DJANGO_SECURE_CROSS_ORIGIN_OPENER_P
 
 BASE_URL = get_env("DJANGO_BASE_URL", "")
 CLIENT_BASE_URL = get_env("DJANGO_CLIENT_BASE_URL", "")
+NLP_API_HOST = get_env('NLP_API_HOST', "")
 
 FIXTURE_DIRS = [
     BASE_DIR / 'fixtures',
@@ -255,11 +256,7 @@ LOGGING = {
             "handlers": ["verbose"],
             "level": "INFO",
         },
-        "event": {
-            "handlers": ["verbose"],
-            "level": "INFO",
-        },
-        "friend": {
+        "message": {
             "handlers": ["verbose"],
             "level": "INFO",
         },

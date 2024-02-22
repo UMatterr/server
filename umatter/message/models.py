@@ -7,6 +7,7 @@ class Phrase(IDModel, TimestampModel):
 
     class Meta:
         db_table = 'phrase'
+        ordering = ['-created']
 
     def __str__(self):
         return str(self.text, self.id)
