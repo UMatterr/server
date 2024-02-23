@@ -110,3 +110,57 @@ def post_converted_phrase(request):
     except Exception as e:
         logger.error("Error: %s", e, exc_info=True)
         return HttpResponseServerError('Error')
+
+
+@csrf_exempt
+@auth_user
+@control_request_method(method=('PUT'))
+def put_message(request):
+
+    phrase = []
+    try:
+        body = request.body.decode('utf-8')
+        body = json.loads(body)
+        msg = body.get('message')
+        event_type_id = body.get('eventType')
+        phrase.append(msg)
+        logger.info("phrase: %s, %s", str(event_type_id), phrase)
+
+    except Exception as e:
+        logger.error("Invalid body: %s, %s", e, body, exc_info=True)
+        return HttpResponseBadRequest('Invalid body')
+
+    if not phrase:
+        logger.error("no phrase: %s", phrase)
+        return HttpResponseBadRequest('no phrase')
+
+    url = f"{settings.NLP_API_HOST}/phrase/{event_type_id}"
+    payload = {
+        "content": phrase,
+    }
+
+    if not is_valid_event_type(event_type_id):
+        logger.error("Invalid event type id")
+        return HttpResponseBadRequest('Invalid event type id')
+
+    try:
+        rsp = req.post(
+            url,
+            json=payload,
+            timeout=60
+        )
+        logger.info("data: %s", rsp.__dict__)
+
+        data = rsp.json()
+        logger.info("data: %s", data)
+
+        return JsonResponse(
+            data=data,
+            status=204,
+            safe=False,
+        )
+
+    except Exception as e:
+        logger.error("Error: %s", e, exc_info=True)
+        return HttpResponseServerError('Error')
+
