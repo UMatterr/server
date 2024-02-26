@@ -63,7 +63,6 @@ class User(AbstractBaseUser, PermissionsMixin, IDModel, PhoneModel, TimestampMod
     )
     kakao_refresh_token = models.CharField(
         max_length=500,
-        unique=True,
         validators=[MaxLengthValidator(500)],
     )
     # if it's not an empty string, it will show

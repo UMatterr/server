@@ -13,8 +13,6 @@ import requests as req
 from user.utils import auth_user, control_request_method
 from event.utils import is_valid_event_type
 
-from .models import Phrase
-
 
 logger = logging.getLogger(__name__)
 
