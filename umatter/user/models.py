@@ -63,7 +63,6 @@ class User(AbstractBaseUser, PermissionsMixin, IDModel, PhoneModel, TimestampMod
     )
     kakao_refresh_token = models.CharField(
         max_length=500,
-        unique=True,
         validators=[MaxLengthValidator(500)],
     )
     # if it's not an empty string, it will show
@@ -84,14 +83,8 @@ class User(AbstractBaseUser, PermissionsMixin, IDModel, PhoneModel, TimestampMod
     is_superuser = models.BooleanField(
         default=False,
     )
-    # verified_email = models.BooleanField(default=False)
-    # verified_phone_number = models.BooleanField(default=False)
 
     USERNAME_FIELD = 'email'
-
-    # REQUIRED_FIELDS = [
-    #     'email', 'password',
-    # ]
 
     class Meta:
         db_table = 'user'

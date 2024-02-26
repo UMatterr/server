@@ -48,6 +48,7 @@ SECURE_CROSS_ORIGIN_OPENER_POLICY = get_env("DJANGO_SECURE_CROSS_ORIGIN_OPENER_P
 
 BASE_URL = get_env("DJANGO_BASE_URL", "")
 CLIENT_BASE_URL = get_env("DJANGO_CLIENT_BASE_URL", "")
+NLP_API_HOST = get_env('NLP_API_HOST', "")
 
 FIXTURE_DIRS = [
     BASE_DIR / 'fixtures',
@@ -63,6 +64,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'django.contrib.sites',
 
+    # app
     'event',
     'friend',
     'message',
@@ -123,8 +125,8 @@ WSGI_APPLICATION = 'umatter.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
-
 DATABASES = {
+    # primary db
     'default': {
         "ENGINE": "django.db.backends.postgresql",
         "NAME": get_env("POSTGRES_DB", ""),
@@ -133,8 +135,19 @@ DATABASES = {
         "HOST": get_env("POSTGRES_HOST", ""),
         "PORT": get_env("POSTGRES_PORT", ""),
         # "OPTIONS": {},
-    }
+    },
+    # # replica of the primary db
+    # 'replica': {
+    #     "ENGINE": "django.db.backends.postgresql",
+    #     "NAME": get_env("SUB_POSTGRES_DB", ""),
+    #     "USER": get_env("SUB_POSTGRES_USER", ""),
+    #     "PASSWORD": get_env("SUB_POSTGRES_PASSWORD", ""),
+    #     "HOST": get_env("SUB_POSTGRES_HOST", ""),
+    #     "PORT": get_env("SUB_POSTGRES_PORT", ""),
+    #     # "OPTIONS": {},
+    # },
 }
+# DATABASE_ROUTERS = []
 
 
 # Password validation
@@ -243,11 +256,7 @@ LOGGING = {
             "handlers": ["verbose"],
             "level": "INFO",
         },
-        "event": {
-            "handlers": ["verbose"],
-            "level": "INFO",
-        },
-        "friend": {
+        "message": {
             "handlers": ["verbose"],
             "level": "INFO",
         },

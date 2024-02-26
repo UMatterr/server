@@ -11,7 +11,7 @@ from django.views.decorators.csrf import csrf_exempt
 from friend.models import Friend
 from user.utils import auth_user, control_request_method
 
-from .models import CustomEventType, Event, EventType
+from .models import Event, EventType
 from .serializers import (
     EventListSerializer, EventTypeSerializer,
     FriendEventListSerializer,
@@ -27,10 +27,35 @@ def get_events(request):
 
     user = request.user
     if request.method == 'GET':
-        event = Event.objects.filter(user__id=user.id)
-        logger.info(f"event: {event}")
+        friend_name = request.GET.get("name", "")
+        event_type = request.GET.get("etype", "")
+
+        event = Event.objects.filter(
+            user__id=user.id
+        )
+        logger.info("before filtering: %s", event)
+
+        if friend_name != "" and event_type != "":
+            event = event.filter(
+                event_type__id=event_type,
+                friend__name=friend_name
+            )
+
+        elif friend_name != "":
+            event = event.filter(
+                friend__name=friend_name
+            )
+
+        elif event_type != "":
+            event = event.filter(
+                event_type__id=event_type,
+            )
+
+        logger.info("before filtering: %s", event)
+
         data = EventListSerializer(event, many=True).data
-        logger.info(f"event serialized: {data}")
+        logger.info("event serialized: %s", data)
+
         return JsonResponse(data=data, status=200, safe=False)
 
 
@@ -51,9 +76,9 @@ def get_event_by_friend(request, pk):
 @csrf_exempt
 @auth_user
 @control_request_method(method=('DELETE'))
-def delete_event(request, uuid):
+def delete_event(request, pk):
     try:
-        event = Event.objects.get(id=uuid)
+        event = Event.objects.get(id=pk)
         logger.info(f"event: {event}")
         event.delete()
 
@@ -113,14 +138,13 @@ def create_event(request):
         )
 
     try:
-        name = data['name']
         friend = Friend.objects.get(
             id=data['friendId']
         )
         event_type = EventType.objects.get(
             id=int(data['eventTypeId'])
         )
-        custom_event_type = None
+        name = event_type.name
         date = data['date']
         repeat = data['repeat']
 
@@ -141,39 +165,12 @@ def create_event(request):
             status=400
         )
 
-    if event_type.name == '기타':
-        logger.info("name: %s, %s", name, event_type.name)
-        if name is None:
-            return HttpResponseBadRequest(
-                content={'No event name'},
-            )
-
-        try:
-            custom_event_type = CustomEventType.objects.get(name=name)
-            logger.info(
-                "Retrieved an existing custom event type: %s",
-                custom_event_type
-            )
-
-        except CustomEventType.DoesNotExist:
-            custom_event_type = CustomEventType(name=name)
-            custom_event_type.save()
-            logger.info(
-                "Created a new custom event type: %s",
-                custom_event_type
-            )
-        name = custom_event_type.name
-
-    else:
-        name = event_type.name
-
     try:
         event = Event(
             name=name,
             user=user,
             friend=friend,
             event_type=event_type,
-            custom_event_type=custom_event_type,
             date=date,
             repeat=repeat,
         )

@@ -1,15 +1,12 @@
 services:
   db:
     image: postgres:15
-    # volumes:
-    #   - ./db:/var/lib/postgresql/data
     env_file:
-      - ./config/postgres/.env-dev
+      - ./config/postgres/.env
     ports:
       - 5432:5432
   web:
     build: .
-    command: gunicorn --bind web:8000 --workers 4 --threads 4 --timeout 60 --log-level=info --log-file=- umatter.wsgi:application
     ports:
       - 8000:8000
     env_file:

@@ -17,19 +17,28 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import include, path
 
-from core.views import health_check
-from event.views import get_events, create_event, get_event_type
+from event.views import get_events, create_event, delete_event, get_event_type
 from friend.views import get_or_post_friend
+from message.views import post_converted_phrase, put_message
 
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('healthz', health_check, name='health_check'),
     path('auth/', include('user.urls')),
-    path('friends', get_or_post_friend, name='friends'),
-    path('friends/', include('friend.urls')),
+
+    # event
     path('etype', get_event_type, name='get_event_type'),
     path('event', create_event, name='create_event'),
+    path('event/<uuid:pk>', delete_event, name='delete_event'),
     path('events', get_events, name='get_events'),
     path('events/', include('event.urls')),
+
+    # friend
+    path('friends', get_or_post_friend, name='friends'),
+    path('friends/', include('friend.urls')),
+
+    # message
+    path('converted/',post_converted_phrase, name='post_converted_phrase'),
+    path('phrase/', include('message.urls')),
+    path('message', put_message, name='put_message'),
 ]

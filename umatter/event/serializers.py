@@ -20,12 +20,13 @@ class EventListSerializer(serializers.ModelSerializer):
 
     eventId = serializers.SerializerMethodField('get_alternative_id')
     eventName = serializers.SerializerMethodField('get_alternative_event_name')
+    eventType = serializers.SerializerMethodField('get_alternative_event_type_id')
     friendName = serializers.SerializerMethodField('get_alternative_friend_name')
 
     class Meta:
         model = Event
         fields = [
-            'eventId', 'eventName', 'friendName', 'date', 'repeat',
+            'eventId', 'eventName', 'eventType', 'friendName', 'date', 'repeat',
         ]
 
     def get_alternative_id(self, obj):
@@ -33,6 +34,9 @@ class EventListSerializer(serializers.ModelSerializer):
 
     def get_alternative_event_name(self, obj):
         return obj.name
+
+    def get_alternative_event_type_id(self, obj):
+        return obj.event_type.id
 
     def get_alternative_friend_name(self, obj):
         return obj.friend.name

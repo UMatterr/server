@@ -21,3 +21,4 @@ class Friend(IDModel, PhoneModel, TimestampModel):
 
     class Meta:
         db_table = 'friend'
+        ordering = ['name']
