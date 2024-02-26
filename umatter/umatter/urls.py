@@ -25,6 +25,7 @@ from message.views import post_converted_phrase, put_message
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('auth/', include('user.urls')),
+    path('healthz', health_check, name='health_check'),
 
     # event
     path('etype', get_event_type, name='get_event_type'),
