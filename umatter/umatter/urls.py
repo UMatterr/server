@@ -17,6 +17,7 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import include, path
 
+from core.views import health_check
 from event.views import get_events, create_event, delete_event, get_event_type
 from friend.views import get_or_post_friend
 from message.views import post_converted_phrase, put_message
