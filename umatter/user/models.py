@@ -42,7 +42,7 @@ class User(AbstractBaseUser, PermissionsMixin, IDModel, PhoneModel, TimestampMod
 
     kakao_id = models.CharField(
         max_length=250,
-        unique=True,
+        # unique=True,
         editable=False,
         validators=[MaxLengthValidator(250)],
     )
@@ -58,12 +58,13 @@ class User(AbstractBaseUser, PermissionsMixin, IDModel, PhoneModel, TimestampMod
     )
     email = models.EmailField(
         max_length=250,
-        unique=True,
+        # unique=True,
         validators=[EmailValidator()],
     )
     kakao_refresh_token = models.CharField(
         max_length=500,
         validators=[MaxLengthValidator(500)],
+        unique=False,
     )
     # if it's not an empty string, it will show
     username = models.CharField(

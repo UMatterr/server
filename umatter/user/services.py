@@ -167,11 +167,14 @@ def get_user_by_kakao_id(kakao_id):
 def logout_and_remove_token(refresh_token):
     try:
         user = User.objects.get(kakao_refresh_token=refresh_token)
+        logger.info(f"logout user before: {user.kakao_refresh_token}")
+        user.kakao_refresh_token = ""
+        logger.info(f"logout user after: {user.kakao_refresh_token}")
+        user.save()
+        logger.info(f"logout user after2: {user.kakao_refresh_token}")
         new_log = LoginLog.objects.create(
             user=user, login_type='o'
         )
-        user.kakao_refresh_token = ""
-        user.save()
         logger.info(f"Created logout log: {new_log}")
         return user
 

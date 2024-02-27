@@ -2,6 +2,7 @@ import logging
 
 from django.http import (
     HttpResponseRedirect,
+    HttpResponseServerError,
     JsonResponse,
 )
 from django.shortcuts import redirect
@@ -133,7 +134,12 @@ def kakao_logout(request):
     refresh_token = request.COOKIES.get("refreshToken")
     if is_logged_in:
         logger.info(f"refresh token for logout: {refresh_token}")
-        logout_and_remove_token(refresh_token=refresh_token)
+
+        is_confirmed = logout_and_remove_token(refresh_token=refresh_token)
+        if is_confirmed is None:
+            logger.error('logout and remove token failed')
+            return HttpResponseServerError()
+
         rsp = HttpResponseRedirect(CLIENT_BASE_URL)
         rsp = delete_cookies(rsp)
 

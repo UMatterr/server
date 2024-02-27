@@ -12,6 +12,8 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 from datetime import timedelta
 from pathlib import Path
 
+# from django.db.backends.postgresql.psycopg_any import IsolationLevel
+
 from core.utils import load_env, get_env
 from corsheaders.defaults import (
     default_headers, default_methods
@@ -134,7 +136,9 @@ DATABASES = {
         "PASSWORD": get_env("POSTGRES_PASSWORD", ""),
         "HOST": get_env("POSTGRES_HOST", ""),
         "PORT": get_env("POSTGRES_PORT", ""),
-        # "OPTIONS": {},
+        # "OPTIONS": {
+        #     "isolation_level": IsolationLevel.SERIALIZABLE,
+        # },
     },
     # # replica of the primary db
     # 'replica': {
