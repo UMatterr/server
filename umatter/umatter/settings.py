@@ -136,22 +136,23 @@ DATABASES = {
         "PASSWORD": get_env("POSTGRES_PASSWORD", ""),
         "HOST": get_env("POSTGRES_HOST", ""),
         "PORT": get_env("POSTGRES_PORT", ""),
-        # "OPTIONS": {
-        #     "isolation_level": IsolationLevel.SERIALIZABLE,
-        # },
+        # "OPTIONS": {},
     },
-    # # replica of the primary db
-    # 'replica': {
-    #     "ENGINE": "django.db.backends.postgresql",
-    #     "NAME": get_env("SUB_POSTGRES_DB", ""),
-    #     "USER": get_env("SUB_POSTGRES_USER", ""),
-    #     "PASSWORD": get_env("SUB_POSTGRES_PASSWORD", ""),
-    #     "HOST": get_env("SUB_POSTGRES_HOST", ""),
-    #     "PORT": get_env("SUB_POSTGRES_PORT", ""),
-    #     # "OPTIONS": {},
-    # },
+    # replica of the primary db
+    'replica': {
+        "ENGINE": "django.db.backends.postgresql",
+        "NAME": get_env("SUB_POSTGRES_DB", ""),
+        "USER": get_env("SUB_POSTGRES_USER", ""),
+        "PASSWORD": get_env("SUB_POSTGRES_PASSWORD", ""),
+        "HOST": get_env("SUB_POSTGRES_HOST", ""),
+        "PORT": get_env("SUB_POSTGRES_PORT", ""),
+        # "OPTIONS": {},
+    },
 }
-# DATABASE_ROUTERS = []
+USE_REPLICA_DATABASE = get_env("DJANGO_USE_REPLICA_DATABASE", "false") == "true"
+DATABASE_ROUTERS = [
+    "core.routers.PrimaryReplicaRouter",
+]
 
 
 # Password validation
