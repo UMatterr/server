@@ -1,7 +1,5 @@
 name: "Django server CI"
 
-description: "Push a Django server image to AWS ECR for umatter"
-
 on:
   push:
     branches: [ main ]
