@@ -54,9 +54,21 @@ def create_user_with_kakao_info(
 
 
 def delete_cookies(rsp):
-    rsp.delete_cookie('isLoggedIn')
-    rsp.delete_cookie('accessToken')
-    rsp.delete_cookie('refreshToken')
+    rsp.delete_cookie(
+        key='isLoggedIn',
+        domain=SESSION_COOKIE_DOMAIN,
+        samesite=SESSION_COOKIE_SAMESITE,
+    )
+    rsp.delete_cookie(
+        key='accessToken',
+        domain=SESSION_COOKIE_DOMAIN,
+        samesite=SESSION_COOKIE_SAMESITE,
+    )
+    rsp.delete_cookie(
+        key='refreshToken',
+        domain=SESSION_COOKIE_DOMAIN,
+        samesite=SESSION_COOKIE_SAMESITE,
+    )
     return rsp
 
 
