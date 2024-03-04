@@ -54,9 +54,21 @@ def create_user_with_kakao_info(
 
 
 def delete_cookies(rsp):
-    rsp.delete_cookie('isLoggedIn')
-    rsp.delete_cookie('accessToken')
-    rsp.delete_cookie('refreshToken')
+    rsp.delete_cookie(
+        key='isLoggedIn',
+        domain=SESSION_COOKIE_DOMAIN,
+        samesite=SESSION_COOKIE_SAMESITE,
+    )
+    rsp.delete_cookie(
+        key='accessToken',
+        domain=SESSION_COOKIE_DOMAIN,
+        samesite=SESSION_COOKIE_SAMESITE,
+    )
+    rsp.delete_cookie(
+        key='refreshToken',
+        domain=SESSION_COOKIE_DOMAIN,
+        samesite=SESSION_COOKIE_SAMESITE,
+    )
     return rsp
 
 
@@ -167,11 +179,14 @@ def get_user_by_kakao_id(kakao_id):
 def logout_and_remove_token(refresh_token):
     try:
         user = User.objects.get(kakao_refresh_token=refresh_token)
+        logger.info(f"logout user before: {user.kakao_refresh_token}")
+        user.kakao_refresh_token = ""
+        logger.info(f"logout user after: {user.kakao_refresh_token}")
+        user.save()
+        logger.info(f"logout user after2: {user.kakao_refresh_token}")
         new_log = LoginLog.objects.create(
             user=user, login_type='o'
         )
-        user.kakao_refresh_token = ""
-        user.save()
         logger.info(f"Created logout log: {new_log}")
         return user
 
