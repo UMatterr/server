@@ -13,7 +13,6 @@ fi
 python manage.py flush --noinput
 python manage.py makemigrations
 python manage.py migrate
-python manage.py collectstatic
 python manage.py loaddata test_initial_data.json
 gunicorn -w 4 \
   -b web:8000 \
