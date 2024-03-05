@@ -1,3 +1,9 @@
 #!/bin/bash
-docker build -t 767397926607.dkr.ecr.ap-northeast-2.amazonaws.com/umatter:latest . && \
-docker push 767397926607.dkr.ecr.ap-northeast-2.amazonaws.com/umatter:latest 
+
+set -e
+
+AWS_ECR_HOST=$(echo $AWS_ECR_HOST)
+
+docker build -t ${AWS_ECR_HOST}:latest .
+
+docker push ${AWS_ECR_HOST}:latest 
